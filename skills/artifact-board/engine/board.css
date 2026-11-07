@@ -1,0 +1,93 @@
+:root{--bg:#f4f6f9;--paper:#fff;--ink:#18202c;--muted:#5d6676;--line:#dce1e8;--accent:#2f5fb3;--accent-soft:#e6eefb;
+--good:#1f7a4d;--good-soft:#e2f3ea;--warn:#946300;--warn-soft:#fbf0d6;--bad:#a63232;--bad-soft:#f8e3e3;--mute-soft:#eceef2;
+--f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;--f-head:"Noto Serif KR","Malgun Gothic",serif;--f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11151c;--paper:#19202a;--ink:#e5e9f0;--muted:#99a3b3;--line:#2b3442;
+--accent:#8fb2ff;--accent-soft:#1f2b45;--good:#6fd3a0;--good-soft:#16342a;--warn:#e6c063;--warn-soft:#382e17;--bad:#f09090;--bad-soft:#3b2022;--mute-soft:#262c36;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151c;--paper:#19202a;--ink:#e5e9f0;--muted:#99a3b3;--line:#2b3442;
+--accent:#8fb2ff;--accent-soft:#1f2b45;--good:#6fd3a0;--good-soft:#16342a;--warn:#e6c063;--warn-soft:#382e17;--bad:#f09090;--bad-soft:#3b2022;--mute-soft:#262c36;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.75;margin:0;
+padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 64px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3,h4{font-family:var(--f-head);text-wrap:balance;line-height:1.35;margin:18px 0 4px}
+h1{font-size:25px;margin-top:4px}h2{font-size:21px}h3{font-size:18px}h4,h5,h6{font-size:16px}
+p{margin:6px 0}
+.meta{color:var(--muted);font-size:13.5px}
+.label{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:500}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 20px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.todo{border-left:4px solid var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:8px 0}
+.stat{display:flex;flex-direction:column;gap:2px;background:var(--bg);border-radius:6px;padding:10px 12px}
+.stat b{font-family:var(--f-mono);font-size:26px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat.alert b{color:var(--bad)}
+.quote{color:var(--ink);background:var(--accent-soft);border-radius:6px;padding:8px 14px;margin:6px 0}
+.quote p{margin:4px 0}
+ul,ol{margin:4px 0;padding-left:1.4em}
+li{margin:3px 0}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--paper);margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12.5px;color:var(--muted);font-weight:500;background:var(--bg)}
+td.num{font-family:var(--f-mono);color:var(--accent);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+code{font-family:var(--f-mono);font-size:12.5px;background:var(--mute-soft);padding:1px 4px;border-radius:3px;word-break:break-all}
+pre{background:var(--mute-soft);padding:10px;border-radius:6px;overflow-x:auto}
+pre code{background:none;word-break:normal}
+.math{overflow-x:auto;margin:8px 0;padding:4px 0}
+mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+.lnk{color:var(--accent);border-bottom:1px dotted var(--accent)}
+a{color:var(--accent)}
+.chip{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;font-weight:500;white-space:nowrap}
+.ok{background:var(--good-soft);color:var(--good)}.mid{background:var(--warn-soft);color:var(--warn)}
+.no{background:var(--bad-soft);color:var(--bad)}.ac{background:var(--accent-soft);color:var(--accent)}.mute{background:var(--mute-soft);color:var(--muted)}
+nav{display:flex;flex-wrap:wrap;gap:4px}
+nav button{font:inherit;cursor:pointer;border:1px solid transparent;background:none;color:var(--muted)}
+nav.top{border-bottom:2px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding-top:6px}
+nav.top button{font-size:15.5px;font-weight:700;padding:9px 16px;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav.top button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.sub{gap:6px;margin:4px 0 2px}
+nav.sub button{font-size:13.5px;padding:5px 12px;border-radius:999px;border-color:var(--line);background:var(--paper)}
+nav.sub button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+nav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.foot{font-size:12.5px;color:var(--muted)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button.act,.fb button,.chat button{font:inherit;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:5px;padding:4px 10px}
+button.act:hover,.fb button:hover,.chat button:hover{border-color:var(--accent);color:var(--accent)}
+button.act[disabled]{opacity:.55;cursor:default}
+.fb{margin-top:14px;border-top:1px dashed var(--line);padding-top:8px}
+.fb summary{cursor:pointer;color:var(--accent);font-size:14px}
+.fb form,.chat form{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.fb select,.fb textarea,.chat textarea,.chat select{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:6px 8px;width:100%}
+.fb textarea,.chat textarea{min-height:70px;resize:vertical}
+.fbmsg{font-size:13px;color:var(--good)}
+.inbox-item{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:6px 0;background:var(--bg)}
+.inbox-item .reply{border-left:3px solid var(--good);padding-left:10px;margin-top:6px;white-space:pre-wrap}
+.chat-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:20;
+font:inherit;font-weight:700;border:0;border-radius:999px;padding:11px 18px;background:var(--accent);color:var(--paper);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.chat{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(70px,calc(env(safe-area-inset-bottom,0px) + 70px));z-index:21;
+width:min(460px,calc(100vw - 32px));max-height:min(72vh,720px);display:flex;flex-direction:column;gap:8px;background:var(--paper);
+border:1px solid var(--line);border-radius:8px;padding:12px;box-shadow:0 4px 24px rgba(0,0,0,.25)}
+.chat[hidden]{display:none}
+.chat .log{overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:60px;flex:1}
+.chat .m{border-radius:6px;padding:7px 10px;white-space:pre-wrap;font-size:14.5px;line-height:1.65}
+.chat .m.u{background:var(--accent-soft);align-self:flex-end;max-width:90%}
+.chat .m.a{background:var(--bg);border:1px solid var(--line)}
+.chat .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chat .sel{font-size:12.5px;color:var(--muted);background:var(--mute-soft);border-radius:4px;padding:3px 6px;max-height:4.5em;overflow:hidden}
+
+figure.fig{margin:12px 0;background:#fff;border:1px solid var(--line);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px;max-width:100%}
+figure.fig img{width:100%;height:auto;display:block}
+figure.fig figcaption{font-size:13px;color:#4a5361}
+/* 1.3.0: 질문 창 크기 조절 손잡이, 한 번 누르는 버튼의 메모 칸 */
+.chat .grip{position:absolute;left:0;top:0;width:18px;height:18px;cursor:nwse-resize;touch-action:none;border-top-left-radius:8px;
+background:linear-gradient(135deg,var(--accent) 0 18%,transparent 18% 34%,var(--accent) 34% 44%,transparent 44%);opacity:.55}
+.chat .grip:hover{opacity:1}
+.act-note{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;margin-left:4px}
+.act-note input{font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--ink);min-width:12em}
+.act-note button{font:inherit;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:5px;padding:3px 8px}
+/* 1.4.0: 선택한 부분 + 선택 해제 버튼 */
+.chat .sel{display:flex;gap:8px;align-items:flex-start}
+.chat .sel .sel-t{flex:1;min-width:0;overflow:hidden;max-height:4.5em}
+.chat .sel button{flex:none;font-size:12px;padding:2px 8px}
+nav.sub.one{display:none}

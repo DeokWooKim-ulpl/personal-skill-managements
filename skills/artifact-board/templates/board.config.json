@@ -1,0 +1,17 @@
+{
+  "config_version": 1,
+  "title": "보고판",
+  "kicker": "",
+  "header_note": "모르는 내용은 오른쪽 아래 \"질문하기\"로 묻고, 고칠 점은 각 탭 아래 \"의견 보내기\"로 보내세요.",
+  "artifact_url": "",
+  "root": ".",
+  "out_html": "board/board.html",
+  "hash_file": "board/board.hash",
+  "site_dir": "board/site",
+  "src_dir": "board/src",
+  "reading_list": "",
+  "papers_dir": "",
+  "hooks": "",
+  "inbox": {"enabled": true},
+  "chat": {"enabled": true}
+}

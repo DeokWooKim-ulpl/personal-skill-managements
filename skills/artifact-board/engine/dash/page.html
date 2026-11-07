@@ -1,0 +1,1448 @@
+<meta charset="utf-8">
+<title>__PAGE_TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+KR:wght@600;700&display=swap">
+<style>
+/* 레이아웃: 왼쪽 목차 + 가운데 읽기 칸. 질문·메모는 해당 문단 바로 아래에 붙는 '여백 노트'로 */
+:root{
+  --paper:#f6f7f4; --sheet:#ffffff; --ink:#1c2326; --muted:#5b676b; --line:#dbe0dc; --line2:#c3cbc6;
+  --accent:#0d6b70; --accent-soft:#e2f0ef; --note:#b7791f; --note-soft:#fbf3e2; --note-line:#ecd29b;
+  --ok:#2f7a3d; --ok-soft:#e5f2e7; --warn:#a15c07; --warn-soft:#fbefdc; --bad:#b4312a; --bad-soft:#fbe7e5;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-title:"Noto Serif KR","Nanum Myeongjo",Georgia,serif;
+  --f-mono:"IBM Plex Mono",Consolas,"D2Coding",monospace;
+  --side:272px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111618; --sheet:#171d20; --ink:#e3e8e6; --muted:#9aa7aa; --line:#29333a; --line2:#3a4750;
+  --accent:#5fc2c6; --accent-soft:#16343a; --note:#e2b24a; --note-soft:#2e2717; --note-line:#5b4a22;
+  --ok:#7fcb8b; --ok-soft:#183020; --warn:#e9a54d; --warn-soft:#33260f; --bad:#f08a80; --bad-soft:#3a1c1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111618; --sheet:#171d20; --ink:#e3e8e6; --muted:#9aa7aa; --line:#29333a; --line2:#3a4750;
+  --accent:#5fc2c6; --accent-soft:#16343a; --note:#e2b24a; --note-soft:#2e2717; --note-line:#5b4a22;
+  --ok:#7fcb8b; --ok-soft:#183020; --warn:#e9a54d; --warn-soft:#33260f; --bad:#f08a80; --bad-soft:#3a1c1a; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.72}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+.app{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:100vh}
+/* 목차 */
+.side{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow:auto;border-right:1px solid var(--line);background:var(--sheet);
+  padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:14px}
+.brand{font-family:var(--f-title);font-size:17px;font-weight:700;line-height:1.35;margin:0 0 4px}
+.brand small{display:block;font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
+.nav h4{font-size:11.5px;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:20px 0 6px}
+.nav a{display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:5px 9px;margin:1px 0;border-radius:6px;text-decoration:none;color:var(--ink);font-size:14px;line-height:1.4}
+.nav a:hover{background:var(--accent-soft)}
+.nav a[aria-current="page"]{background:var(--accent);color:var(--sheet)}
+.nav a .cnt{font-family:var(--f-mono);font-size:11px;padding:0 6px;border-radius:9px;background:var(--note-soft);color:var(--note);border:1px solid var(--note-line)}
+.nav a[aria-current="page"] .cnt{background:transparent;color:var(--sheet);border-color:currentColor}
+/* 본문 */
+.main{min-width:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 0;margin-bottom:18px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.topbar .menu{display:none}
+.status{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 12px;margin-left:auto}
+.status b{font-weight:500;color:var(--ink)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:5px;vertical-align:1px}
+.dot.on{background:var(--ok)} .dot.off{background:var(--warn)}
+.btn{cursor:pointer;border:1px solid var(--line2);background:var(--sheet);border-radius:7px;padding:5px 11px;font-size:13px;line-height:1.4}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--sheet)}
+.btn.note{background:var(--note-soft);border-color:var(--note-line);color:var(--note)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.tier{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+.tier select{border:1px solid var(--line2);border-radius:7px;background:var(--sheet);padding:4px 6px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:820px;margin:0 auto}
+.vhead h1{font-family:var(--f-title);font-size:26px;line-height:1.35;margin:4px 0 6px;text-wrap:balance}
+.vhead .kick{font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted);margin:0 0 14px}
+.notice{border:1px solid var(--warn);background:var(--warn-soft);color:var(--ink);border-radius:8px;padding:9px 13px;font-size:14px;margin:10px 0}
+.notice b{color:var(--warn)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin:14px 0 18px}
+.tile{border:1px solid var(--line);border-radius:10px;background:var(--sheet);padding:10px 13px}
+.tile span{display:block;font-size:12px;color:var(--muted)}
+.tile.alert{border-color:var(--bad);background:var(--bad-soft)} .tile.alert b{color:var(--bad)}
+a.tile{text-decoration:none;color:inherit} a.tile:hover{border-color:var(--accent)}
+/* 일정 (dash 1.3.0, 한화 연구 대시보드에서 옮김): D-day 칸·기간 막대·표 날짜 칩 */
+.tile.soon{border-color:var(--warn);background:var(--warn-soft)} .tile.soon b{color:var(--warn)}
+.tile.done{opacity:.6}
+.period{margin:4px 0 22px}
+.ptrack{position:relative;height:12px;border-radius:6px;background:var(--line);overflow:visible}
+.pfill{position:absolute;inset:0 auto 0 0;border-radius:6px;background:var(--accent)}
+.pmark{position:absolute;top:-4px;width:3px;height:20px;margin-left:-1px;background:var(--warn);border-radius:1px}
+.pnow{position:absolute;top:-6px;width:12px;height:24px;margin-left:-6px;border-radius:6px;border:3px solid var(--sheet);background:var(--ink)}
+.plabels{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:8px;font-variant-numeric:tabular-nums}
+.plabels b{color:var(--ink);font-weight:500}
+.plegend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted);margin-top:4px}
+.plegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.plegend .pm{background:var(--warn)} .plegend .pn{background:var(--ink);border-radius:50%}
+.dd{display:inline-block;margin-left:6px;padding:0 7px;border-radius:9px;font-family:var(--f-mono);font-size:11.5px;line-height:1.6;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.dd.soon{background:var(--warn-soft);color:var(--warn)}
+.dd.past{background:transparent;color:var(--muted);border:1px solid var(--line)}
+tr.past td{color:var(--muted)}
+.tile b{display:block;font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.card{border:1px solid var(--line);background:var(--sheet);border-radius:12px;padding:6px 20px 10px;margin:12px 0 18px}
+.card .doc h2{border-top:0;margin-top:12px}
+.files{border:1px dashed var(--line2);border-radius:10px;padding:8px 14px;margin:10px 0 18px;font-size:13.5px}
+.files summary{cursor:pointer;color:var(--muted);font-weight:500}
+.frow{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:5px 0;border-top:1px solid var(--line)}
+.frow:first-of-type{border-top:0}
+.frow code{font-family:var(--f-mono);font-size:12.5px;word-break:break-all;flex:1 1 260px;min-width:0}
+.frow .t{color:var(--muted);font-size:12px;font-family:var(--f-mono)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px;border-bottom:1px solid var(--line)}
+.tabs button{cursor:pointer;border:0;background:none;padding:7px 4px 9px;margin-right:12px;font-size:14.5px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
+.dochead{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;font-size:12.5px;color:var(--muted);margin:10px 0 14px}
+.dochead code{font-family:var(--f-mono);font-size:12px;word-break:break-all}
+.linkbtn{cursor:pointer;border:0;background:none;color:var(--accent);padding:0;font-size:12.5px;text-decoration:underline;text-underline-offset:2px}
+/* 문서 블록 */
+.doc{position:relative}
+.blk{position:relative;border-left:3px solid transparent;padding-left:12px;margin-left:-15px;border-radius:2px}
+.blk:hover{border-left-color:var(--line)}
+.blk.noted{border-left-color:var(--note-line)}
+.blk.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{background:var(--note-soft)}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){.blk.flash{animation:none;background:var(--note-soft)}}
+.ask{position:absolute;left:-40px;top:2px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line2);background:var(--sheet);color:var(--muted);
+  cursor:pointer;font-size:13px;line-height:1;opacity:0;transition:opacity .12s}
+.blk:hover>.ask,.ask:focus-visible{opacity:1}
+.doc h1{font-family:var(--f-title);font-size:23px;line-height:1.4;margin:26px 0 10px;text-wrap:balance}
+.doc h2{font-family:var(--f-title);font-size:20px;line-height:1.4;margin:30px 0 8px;padding-top:6px;border-top:1px solid var(--line);text-wrap:balance}
+.doc h3{font-size:16.5px;margin:22px 0 6px;font-weight:600}
+.doc h4,.doc h5,.doc h6{font-size:15px;margin:16px 0 4px;font-weight:600}
+.doc p{margin:8px 0}
+.doc ul,.doc ol{margin:6px 0;padding-left:22px}
+.doc li{margin:2px 0}
+.doc code{font-family:var(--f-mono);font-size:.88em;background:var(--accent-soft);padding:0 4px;border-radius:4px;word-break:break-word}
+.doc pre{overflow-x:auto;background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px}
+.doc pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:8px;background:var(--sheet)}
+.tbl table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.5}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.tbl th{background:var(--accent-soft);font-weight:600;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td{font-variant-numeric:tabular-nums}
+figure{margin:14px 0}
+figure img{display:block;max-width:100%;height:auto;border-radius:6px;background:#fff;border:1px solid var(--line)}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
+.mathd{overflow-x:auto;margin:10px 0}
+details.co{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0;background:var(--accent-soft);padding:4px 12px;margin:10px 0}
+details.co>summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--accent)}
+details.co-warning{border-left-color:var(--bad);background:var(--bad-soft)} details.co-warning>summary{color:var(--bad)}
+details.co-example,details.co-tip{border-left-color:var(--ok);background:var(--ok-soft)} details.co-example>summary,details.co-tip>summary{color:var(--ok)}
+details.co-note{border-left-color:var(--warn);background:var(--warn-soft)} details.co-note>summary{color:var(--warn)}
+blockquote{margin:10px 0;padding:2px 14px;border-left:3px solid var(--line2);color:var(--muted)}
+.lnk{border-bottom:1px dotted var(--muted)}
+.miss{color:var(--muted);font-size:13px}
+.loading{color:var(--muted);font-size:14px;padding:30px 0}
+/* 여백 노트 (질문·답·메모) */
+.thread{border:1px solid var(--note-line);background:var(--note-soft);border-radius:10px;margin:8px 0 16px;padding:8px 12px 10px;font-size:14.5px}
+.thread.hidden-notes{display:none}
+.th-top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12px;color:var(--note)}
+.th-top .tag{font-weight:600;letter-spacing:.04em}
+.th-top .when{font-family:var(--f-mono);color:var(--muted)}
+.th-top .sp{flex:1}
+.quote{margin:6px 0;padding:2px 10px;border-left:3px solid var(--note);color:var(--muted);font-size:13.5px}
+details.turn{border-top:1px dashed var(--note-line);padding:4px 0}
+details.turn:first-of-type{border-top:0}
+details.turn>summary{cursor:pointer;font-weight:500;list-style-position:outside}
+.ans{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:6px 0;font-size:14.5px}
+.ans p{margin:6px 0}
+.ans.streaming{white-space:pre-wrap}
+.memo{margin-top:8px;border-top:1px solid var(--note-line);padding-top:6px}
+.memo .lab{font-size:12px;font-weight:600;color:var(--note);letter-spacing:.04em}
+.memo .body p{margin:4px 0}
+textarea{width:100%;min-height:74px;resize:vertical;border:1px solid var(--line2);border-radius:8px;background:var(--sheet);padding:8px 10px;line-height:1.55}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.row .msg{font-size:12.5px;color:var(--muted)}
+.row .err{font-size:12.5px;color:var(--bad)}
+.followup{display:flex;gap:6px;margin-top:6px}
+.tact{display:flex;flex-wrap:wrap;gap:4px 14px;margin:2px 0 4px;font-size:12.5px}
+.tact .linkbtn{font-size:12.5px;color:var(--muted)}
+.tact .linkbtn:hover{color:var(--accent)}
+.tact .linkbtn.danger:hover,.linkbtn[data-armed]{color:var(--bad)}
+.edited{font-size:11.5px;font-weight:400;color:var(--muted)}
+.tedit{margin:6px 0}
+.tedit .lab{font-size:12px;font-weight:600;color:var(--note)}
+.followup input{flex:1;min-width:0;border:1px solid var(--line2);border-radius:7px;background:var(--sheet);padding:5px 9px}
+/* 선택 도구막대 */
+.seltool{position:absolute;z-index:20;display:flex;gap:4px;background:var(--ink);border-radius:8px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.seltool button{cursor:pointer;border:0;border-radius:6px;padding:4px 10px;font-size:13px;background:transparent;color:var(--paper)}
+.seltool button:hover{background:rgba(255,255,255,.15)}
+/* 노트 모음 */
+.nitem{border:1px solid var(--line);background:var(--sheet);border-radius:10px;padding:10px 14px;margin:10px 0}
+.nitem .where{font-size:12.5px;color:var(--muted)}
+.nitem .qs{margin:4px 0 0;padding-left:18px}
+.nitem .mm{background:var(--note-soft);border:1px solid var(--note-line);border-radius:8px;padding:4px 10px;margin-top:6px;font-size:14px}
+.search{width:100%;border:1px solid var(--line2);border-radius:8px;background:var(--sheet);padding:7px 11px;margin:6px 0 10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:30}
+.empty{border:1px dashed var(--line2);border-radius:10px;padding:16px;color:var(--muted);font-size:14px}
+/* 논문 서재 (library) */
+.side .search{margin:8px 0 6px;font-size:13.5px}
+.tree details{margin:2px 0}
+.tree summary{cursor:pointer;font-size:13.5px;font-weight:500;padding:4px 6px;border-radius:6px;list-style:none;display:flex;gap:6px;align-items:baseline}
+.tree summary::-webkit-details-marker{display:none}
+.tree summary::before{content:"▸";color:var(--muted);font-size:11px;flex:0 0 10px}
+.tree details[open]>summary::before{content:"▾"}
+.tree summary:hover{background:var(--accent-soft)}
+.tree summary .n{margin-left:auto;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.tree .sub{padding-left:12px;border-left:1px solid var(--line);margin-left:9px}
+.tree a.pp{display:flex;gap:6px;align-items:baseline;padding:3px 7px;margin:0;border-radius:6px;text-decoration:none;color:var(--ink);font-size:13px;line-height:1.35}
+.tree a.pp:hover{background:var(--accent-soft)}
+.tree a.pp[aria-current="page"]{background:var(--accent);color:var(--sheet)}
+.tree a.pp .y{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);flex:0 0 auto}
+.tree a.pp[aria-current="page"] .y{color:inherit;opacity:.8}
+.tree a.pp .tt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree a.pp .mk{font-size:11px;flex:0 0 auto}
+.tree a.pp .cnt{font-family:var(--f-mono);font-size:10.5px;padding:0 5px;border-radius:9px;background:var(--note-soft);color:var(--note);border:1px solid var(--note-line)}
+.tree a.pp[aria-current="page"] .cnt{background:transparent;color:inherit;border-color:currentColor}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.chip{font-size:11.5px;padding:1px 8px;border-radius:10px;border:1px solid var(--line2);color:var(--muted);background:var(--sheet)}
+.chip.ok{color:var(--ok);background:var(--ok-soft);border-color:transparent}
+.chip.warn{color:var(--warn);background:var(--warn-soft);border-color:transparent}
+.chip.ac{color:var(--accent);background:var(--accent-soft);border-color:transparent}
+.chip.tag{background:var(--paper)}
+.pmeta{font-size:13.5px;color:var(--muted);margin:2px 0 4px}
+.pmeta a{word-break:break-all}
+.sumcard{border:1px solid var(--accent);border-radius:12px;background:var(--sheet);padding:10px 18px 12px;margin:12px 0 18px}
+.sumcard .top{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.sumcard .top b{color:var(--accent);font-weight:600}
+.sumcard .body{font-size:15px}
+.sumcard .body p{margin:6px 0}
+.sumcard .body h3,.sumcard .body strong.h{display:block;font-size:14.5px;margin:12px 0 2px;color:var(--accent)}
+.sumcard figure{margin:10px 0}
+.sumcard .streaming{white-space:pre-wrap}
+.sumcard .sumdoc .blk{margin-left:-15px}
+.sumcard .sumdoc h3{color:var(--accent);font-size:14.5px;margin:12px 0 2px}
+.figref{display:inline-block;font-family:var(--f-mono);font-size:12px;padding:0 6px;border-radius:9px;background:var(--accent-soft);color:var(--accent);vertical-align:1px}
+.sumcard .sumdoc .blk figure{margin:8px 0 4px 0;max-width:640px}
+.sumcard .sumdoc .blk figure figcaption{font-size:12px}
+.sumcard .sumdoc .fignote{margin:2px 0 10px 0;padding:6px 12px 6px 14px;border-left:3px solid var(--accent-soft);background:var(--paper);border-radius:0 8px 8px 0;font-size:14px;max-width:640px}
+.sumcard .sumdoc .fignote .lab{font-size:11.5px;font-weight:600;letter-spacing:.04em;color:var(--accent)}
+.sumcard .sumdoc .fignote p{margin:4px 0}
+.reqbox{border:1px dashed var(--accent);border-radius:12px;background:var(--sheet);padding:10px 16px 12px;margin:0 0 14px}
+.reqbox .lab{font-size:12.5px;font-weight:600;color:var(--accent);letter-spacing:.02em;margin-bottom:4px}
+.reqbox textarea{min-height:56px;margin-top:6px}
+.reqbox .chips .chip{cursor:pointer;background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.reqbox .chips .chip:hover{background:var(--accent);color:var(--sheet)}
+.reqcard{border-color:var(--line2);border-left:4px solid var(--accent)}
+.reqcard .top .q{font-weight:600;color:var(--ink);font-size:14px;flex:1 1 280px;min-width:0}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:12px 0}
+.gallery figure{margin:0;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--sheet)}
+.gallery figure img{cursor:zoom-in;border:0}
+.gallery figcaption b{color:var(--ink)}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:100%;background:#fff;border-radius:6px}
+.doc figure.eq img{max-width:min(100%,560px);border:0;background:transparent}
+.sres{border:1px solid var(--line);background:var(--sheet);border-radius:10px;padding:8px 14px;margin:8px 0}
+.sres .w{font-size:12px;color:var(--muted)}
+.sres a.t{font-size:15px;font-weight:500;text-decoration:none}
+.sres .ex{font-size:13px;color:var(--muted);margin:3px 0 0}
+mark{background:var(--note-soft);color:inherit;padding:0 1px}
+.recent{list-style:none;padding:0;margin:6px 0}
+.recent li{padding:4px 0;border-top:1px solid var(--line);font-size:14px;display:flex;gap:10px;align-items:baseline}
+.recent li:first-child{border-top:0}
+.recent .y{font-family:var(--f-mono);font-size:12px;color:var(--muted);flex:0 0 auto}
+.recent .m{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-left:auto;flex:0 0 auto}
+.doc section[data-part]{display:contents}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;inset:0 auto 0 0;width:min(86vw,320px);z-index:40;transform:translateX(-105%);transition:transform .18s;box-shadow:0 0 30px rgba(0,0,0,.25);
+    padding-left:max(16px,env(safe-area-inset-left,0px))}
+  .side.open{transform:none}
+  .topbar .menu{display:inline-block}
+  .blk{margin-left:0;padding-left:8px}
+  .ask{left:auto;right:0;top:-2px;opacity:.55}
+  .status{margin-left:0}
+}
+</style>
+
+<div class="app">
+  <aside class="side" id="side">
+    <p class="brand">__TITLE__<small>__SUBTITLE__</small></p>
+    <input class="search" id="psearch" type="search" placeholder="논문 찾기: 제목·저자·연도·태그 (Enter: 결과 화면)" aria-label="논문 검색" hidden>
+    <nav class="nav" id="nav" aria-label="목차"></nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <button class="btn menu" id="menuBtn" aria-controls="side">목차</button>
+      <button class="btn note" id="askDocBtn" title="지금 보는 문서 전체에 대해 묻기">이 문서에 질문</button>
+      <button class="btn ghost" id="toggleNotes" aria-pressed="true">질문·메모 숨기기</button>
+      <label class="tier" title="질문·다시 묻기·요약에 쓸 Claude 모델 (이 브라우저에 기억)"><span>답 모델</span><select id="tierSel" aria-label="답 모델"></select></label>
+      <button class="btn" id="syncBtn" title="질문·메모를 원본 md의 사본에 반영해 달라고 Claude에게 요청">노트 동기화</button>
+      <div class="status" id="status"></div>
+    </div>
+    <div class="wrap" id="view"><p class="loading">불러오는 중…</p></div>
+  </main>
+</div>
+<!--__DOCS__-->
+
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$']]},svg:{fontCache:'global'},
+  options:{skipHtmlTags:['script','noscript','style','textarea','pre','code','input']},startup:{typeset:false}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg-full.min.js" async></script>
+<script>
+const DATA = /*__DATA__*/null;
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const VIEWS = {}; DATA.views.forEach(g => g.items.forEach(it => { it.group = g.group; VIEWS[it.id] = it; }));
+const LIB = DATA.library || null;      // 논문 서재 모드: {papers, tree}
+const PAPERS = {};                     // key -> paper
+if (LIB) LIB.papers.forEach(p => { PAPERS[p.k] = p; VIEWS['p-' + p.k] = { id: 'p-' + p.k, title: (p.y ? p.y + ', ' : '') + p.t, group: p.folder, tabs: [[p.k, '원문·번역']], paper: p }; });
+const docParts = new Map();            // key -> {legacy, body, brief} (library)
+let sums = new Map();                  // key -> Claude 요약 (library)
+let searchQ = '', pendingFind = null, fullIndex = null;
+const docCache = new Map();            // key -> html
+const blockText = new Map();           // block id -> 원문 텍스트 (수식 렌더 전)
+let threads = new Map();               // id -> thread
+let syncMeta = null, syncReq = null;
+let store = null, sampleFn = null, dbLive = false;
+let showNotes = true, pendingScroll = null, currentView = null, currentTab = {};
+try { showNotes = localStorage.getItem('dash-show-notes') !== '0'; } catch(e) {}
+/* 답 모델 (dash 1.1.0): 빠름=Haiku, 보통=Sonnet, 깊게=Opus 계열. 실제 버전은 claude.ai가 정함. 기본값은 설정 ASK_TIER */
+const TIERS = [['quick', '빠름 (Haiku)'], ['default', '보통 (Sonnet)'], ['complex', '깊게 (Opus)']];
+const TIER_NAME = {quick: '빠름', default: '보통', complex: '깊게'};
+let askTier = DATA.askTier || 'default';
+try { askTier = localStorage.getItem('dash-ask-tier') || askTier; } catch(e) {}
+const askOpts = extra => Object.assign({ modelTier: askTier, cache: false }, extra);
+$('#tierSel').innerHTML = TIERS.map(([v, l]) => `<option value="${v}"${v === askTier ? ' selected' : ''}>${l}</option>`).join('');
+$('#tierSel').onchange = e => { askTier = e.target.value; try { localStorage.setItem('dash-ask-tier', askTier); } catch(x) {} toast('이제부터 ' + TIER_NAME[askTier] + ' 모델로 답함'); };
+
+/* ---------- 경로 ---------- */
+const winPath = rel => DATA.winRoot + '\\' + rel.replace(/\//g, '\\');
+const baseName = rel => rel.split('/').pop();
+const driveUrl = rel => 'https://drive.google.com/drive/search?q=' + encodeURIComponent(baseName(rel).replace(/\.[^.]+$/, ''));
+function copyText(t, label) {
+  const done = () => toast((label || '경로') + ' 복사함');
+  try { navigator.clipboard.writeText(t).then(done, () => fallbackCopy(t, done)); } catch(e) { fallbackCopy(t, done); }
+}
+function fallbackCopy(t, done) {
+  const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'absolute'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); done(); } catch(e) { toast('복사가 막혀 있음. 경로: ' + t); }
+  ta.remove();
+}
+function toast(m) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+function fileRow(label, rel, when) {
+  return `<div class="frow">${label ? `<span class="t">${esc(label)}</span>` : ''}<code title="${esc(winPath(rel))}">${esc(rel)}</code>
+    ${when ? `<span class="t">${esc(when)}</span>` : ''}
+    <button class="linkbtn" data-copy="${esc(winPath(rel))}">경로 복사</button>
+    <a class="linkbtn" href="${esc(driveUrl(rel))}" target="_blank" rel="noopener">Drive에서 찾기</a></div>`;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-copy]'); if (b) copyText(b.dataset.copy); });
+
+/* ---------- 간단 마크다운 (답·메모용) ---------- */
+function mdLite(src) {
+  const keep = [];
+  let s = String(src || '').replace(/\r/g, '');
+  s = s.replace(/\$\$[\s\S]+?\$\$|\$[^$\n]+?\$/g, m => { keep.push(m); return '\u0000' + (keep.length - 1) + '\u0000'; });
+  const inl = t => esc(t).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*\w])\*([^*\n]+)\*(?!\w)/g, '$1<em>$2</em>');
+  const out = []; let list = null, para = [];
+  const flushP = () => { if (para.length) { out.push('<p>' + inl(para.join(' ')) + '</p>'); para = []; } };
+  const flushL = () => { if (list) { out.push(`<${list.t}>` + list.items.map(i => '<li>' + inl(i) + '</li>').join('') + `</${list.t}>`); list = null; } };
+  for (const ln of s.split('\n')) {
+    const h = ln.match(/^\s*(#{1,4})\s+(.*)$/), ul = ln.match(/^\s*[-*•]\s+(.*)$/), ol = ln.match(/^\s*\d+[.)]\s+(.*)$/);
+    if (!ln.trim()) { flushP(); flushL(); continue; }
+    if (h) { flushP(); flushL(); out.push('<p><strong>' + inl(h[2]) + '</strong></p>'); continue; }
+    if (ul || ol) { flushP(); const t = ul ? 'ul' : 'ol'; if (!list || list.t !== t) { flushL(); list = {t, items: []}; } list.items.push((ul || ol)[1]); continue; }
+    if (list && /^\s{2,}/.test(ln)) { list.items[list.items.length - 1] += ' ' + ln.trim(); continue; }
+    flushL(); para.push(ln.trim());
+  }
+  flushP(); flushL();
+  return out.join('').replace(/\u0000(\d+)\u0000/g, (m, i) => esc(keep[+i]));
+}
+function typeset(el) {
+  const go = () => window.MathJax?.typesetPromise ? MathJax.typesetPromise([el]).catch(() => {}) : null;
+  if (!go()) { let n = 0; const t = setInterval(() => { if (go() || ++n > 40) clearInterval(t); }, 250); }
+}
+
+/* ---------- 저장소: db (공유·영구) / 없으면 이 브라우저에만 ---------- */
+const local = {
+  load() { try { return JSON.parse(localStorage.getItem('dash-threads') || '{}'); } catch(e) { return {}; } },
+  save(obj) { try { localStorage.setItem('dash-threads', JSON.stringify(obj)); } catch(e) {} }
+};
+const writes = new Map();
+function putThread(t) {
+  t.updatedAt = new Date().toISOString();
+  threads.set(t.id, t);
+  const body = JSON.parse(JSON.stringify(t));
+  if (!dbLive) { const o = local.load(); o[t.id] = body; local.save(o); refreshNotes(); return Promise.resolve(); }
+  const prev = writes.get(t.id) || Promise.resolve();
+  const p = prev.then(() => store.doc('threads/' + t.id).set(body)).catch(e => toast('저장 실패: ' + (e.code || '') + ' — 잠시 뒤 다시 저장해 주세요'));
+  writes.set(t.id, p); return p;
+}
+function delThread(id) {
+  threads.delete(id);
+  if (!dbLive) { const o = local.load(); delete o[id]; local.save(o); refreshNotes(); return; }
+  store.doc('threads/' + id).delete().catch(e => toast('삭제 실패: ' + (e.code || '')));
+}
+async function initStore() {
+  threads = new Map(Object.entries(local.load()));
+  renderStatus();
+  const cl = window.claude;
+  if (!cl?.use) { renderStatus(); return; }
+  try { sampleFn = await cl.use('sample'); } catch(e) { sampleFn = null; }
+  try {   // 이 계정에서 쓸 수 없는 등급은 고르지 못하게 (limits가 없는 옛 화면이면 그대로 둠)
+    const lim = sampleFn?.limits ? await sampleFn.limits() : null;
+    if (lim?.modelTiers) $$('#tierSel option').forEach(o => { o.disabled = !lim.modelTiers.includes(o.value); });
+  } catch(e) {}
+  if (!sampleFn) $('#tierSel').closest('.tier').hidden = true;
+  let db = null; try { db = await cl.use('db'); } catch(e) {}
+  if (db) {
+    store = db; dbLive = true;
+    let first = true; const timer = setTimeout(() => { if (first) toast('노트 저장소에 아직 닿지 않음. 잠시 뒤 다시 보임'); }, 10000);
+    db.collection('threads').onSnapshot(snap => {
+      first = false; clearTimeout(timer);
+      // 저장소가 주는 data()는 얼려진(frozen) 객체라 그대로 고치면 조용히 무시됨 → 복사해서 씀
+      const m = new Map(); snap.docs.forEach(d => m.set(d.id, JSON.parse(JSON.stringify(d.data()))));
+      threads = m; refreshNotes();
+    }, e => { clearTimeout(timer); toast('노트 저장소 연결이 끊김 (' + e.code + ')'); });
+    db.doc('meta/sync').onSnapshot(s => {
+      const before = syncMeta?.atIso; syncMeta = s.exists ? s.data() : null; renderStatus();
+      if (before && syncMeta?.atIso && syncMeta.atIso !== before) toast(`md 사본에 반영됨 (${syncMeta.at}, ${syncMeta.count}건)`);
+    }, () => {});
+    db.doc('meta/syncRequest').onSnapshot(s => { syncReq = s.exists ? s.data() : null; renderStatus(); }, () => {});
+    if (LIB) db.collection('summaries').onSnapshot(snap => {
+      const m = new Map(); snap.docs.forEach(d => m.set(d.id, JSON.parse(JSON.stringify(d.data()))));
+      sums = m; refreshSums();
+    }, () => {});
+    if (LIB) db.collection('reqs').onSnapshot(snap => {
+      const m = new Map(); snap.docs.forEach(d => m.set(d.id, JSON.parse(JSON.stringify(d.data()))));
+      reqs = m; refreshSums();
+    }, () => {});
+  }
+  renderStatus();
+}
+/* 요약 탭의 추가 요청(절 요약·목차 정리 등) 저장소: db reqs/<id>, 없으면 이 브라우저 */
+let reqs = new Map();
+const localReqs = {
+  load() { try { return JSON.parse(localStorage.getItem('dash-reqs') || '{}'); } catch(e) { return {}; } },
+  save(o) { try { localStorage.setItem('dash-reqs', JSON.stringify(o)); } catch(e) {} }
+};
+if (LIB) reqs = new Map(Object.entries(localReqs.load()));
+function putReq(r) {
+  r.updatedAt = new Date().toISOString(); reqs.set(r.id, r);
+  if (!dbLive) { const o = localReqs.load(); o[r.id] = r; localReqs.save(o); refreshSums(); return Promise.resolve(); }
+  return store.doc('reqs/' + r.id).set(JSON.parse(JSON.stringify(r))).catch(e => toast('요청 저장 실패: ' + (e.code || '')));
+}
+function delReq(id) {
+  reqs.delete(id);
+  if (!dbLive) { const o = localReqs.load(); delete o[id]; localReqs.save(o); refreshSums(); return; }
+  store.doc('reqs/' + id).delete().catch(e => toast('삭제 실패: ' + (e.code || '')));
+}
+const reqsOf = key => [...reqs.values()].filter(r => r.key === key).sort((a, b) => (a.at || '').localeCompare(b.at || ''));
+/* Claude 요약 저장소 (library): db summaries/<key>, 없으면 이 브라우저 */
+const localSums = {
+  load() { try { return JSON.parse(localStorage.getItem('dash-sums') || '{}'); } catch(e) { return {}; } },
+  save(o) { try { localStorage.setItem('dash-sums', JSON.stringify(o)); } catch(e) {} }
+};
+if (LIB) sums = new Map(Object.entries(localSums.load()));
+function putSum(s) {
+  s.updatedAt = new Date().toISOString(); sums.set(s.key, s);
+  if (!dbLive) { const o = localSums.load(); o[s.key] = s; localSums.save(o); refreshSums(); return Promise.resolve(); }
+  return store.doc('summaries/' + s.key).set(JSON.parse(JSON.stringify(s))).catch(e => toast('요약 저장 실패: ' + (e.code || '')));
+}
+function delSum(key) {
+  sums.delete(key);
+  if (!dbLive) { const o = localSums.load(); delete o[key]; localSums.save(o); refreshSums(); return; }
+  store.doc('summaries/' + key).delete().catch(e => toast('삭제 실패: ' + (e.code || '')));
+}
+function refreshSums() {
+  renderStatus(); renderNav();
+  const v = VIEWS[currentView];
+  if (v?.special === 'sums') renderSumsView($('#view'));
+  else if (v?.paper && (currentTab[v.id] || 'sum') === 'sum' && !$('#sumHost .streaming') && !$('#sumHost .thread.live') && !$('#sumHost .tedit') && !($('#reqText')?.value || '').trim()) renderSummaryTab(v);
+}
+function renderStatus() {
+  const n = threads.size;
+  let sync = '';
+  if (syncMeta?.at) {
+    const after = [...threads.values()].filter(t => !syncMeta.atIso || (t.updatedAt || '') > syncMeta.atIso).length;
+    sync = `md 사본 반영 <b>${esc(syncMeta.at)}</b>` + (after ? ` · 그 뒤 바뀐 노트 <b>${after}</b>건` : ' · 최신');
+  } else sync = 'md 사본: 아직 반영 전';
+  if (syncReq?.requestedAt && (!syncMeta?.atIso || syncReq.requestedAt > syncMeta.atIso))
+    sync += ` · <b>동기화 요청 대기 중</b> (${esc(fmt(syncReq.requestedAt))})`;
+  $('#status').innerHTML = `<span><span class="dot ${dbLive ? 'on' : 'off'}"></span>${dbLive ? '노트 저장소 연결됨' : '노트가 이 브라우저에만 저장됨'}</span>
+    <span>질문·메모 <b>${n}</b>건</span>${LIB ? `<span>Claude 요약 <b>${sums.size}</b>편</span>` : ''}<span>${sync}</span><span>생성 ${esc(DATA.built)}</span>`;
+}
+
+/* ---------- 목차 ---------- */
+function renderNav() {
+  const cnt = {};
+  threads.forEach(t => { cnt[t.view] = (cnt[t.view] || 0) + 1; });
+  if (LIB) return renderTree(cnt);
+  $('#nav').innerHTML = DATA.views.map(g => `<h4>${esc(g.group)}</h4>` + g.items.map(it => {
+    const c = it.id === 'notes' ? threads.size : (cnt[it.id] || 0);
+    return `<a href="#${it.id}" data-v="${it.id}"${it.id === currentView ? ' aria-current="page"' : ''}><span>${esc(it.title)}</span>${c ? `<span class="cnt" title="질문·메모">${c}</span>` : ''}</a>`;
+  }).join('')).join('');
+}
+$('#menuBtn').onclick = () => $('#side').classList.toggle('open');
+$('#nav').addEventListener('click', e => { if (e.target.closest('a')) $('#side').classList.remove('open'); });
+$('#toggleNotes').onclick = () => {
+  showNotes = !showNotes; try { localStorage.setItem('dash-show-notes', showNotes ? '1' : '0'); } catch(e) {}
+  applyNoteVisibility();
+};
+function applyNoteVisibility() {
+  $('#toggleNotes').textContent = showNotes ? '질문·메모 숨기기' : '질문·메모 보이기';
+  $('#toggleNotes').setAttribute('aria-pressed', String(showNotes));
+  $$('.thread:not(.live)').forEach(el => el.classList.toggle('hidden-notes', !showNotes));
+}
+
+/* ---------- 화면 ---------- */
+function route() {
+  const id = decodeURIComponent((location.hash || '').slice(1));
+  const v = VIEWS[id] ? id : DATA.views[0].items[0].id;   // 해시가 없으면 첫 화면
+  currentView = v; renderNav(); renderView(VIEWS[v]);
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+
+function summaryTiles() {   // DATA.summary = [{label, value, sub, alert, date, href}] (설정 파일의 summary()가 만듦)
+  const s = DATA.summary || [];
+  if (!s.length) return '';
+  const sched = Object.values(VIEWS).find(v => v.schedule);
+  return `<div class="tiles">${s.map(x => {
+    // date가 있으면 D-day를 페이지를 연 날 기준으로 계산 (30일 안 주황, 지난 것 흐리게). 일정 화면이 있으면 누를 때 그리로 감
+    const n = x.date ? ddays(x.date) : null;
+    const cls = (x.alert ? ' alert' : '') + (n != null && n >= 0 && n <= 30 ? ' soon' : '') + (n != null && n < 0 ? ' done' : '');
+    const href = x.href || (x.date && sched ? '#' + sched.id : '');
+    const inner = `<span>${esc(x.label)}</span><b>${esc(x.date ? ddLabel(x.date) : x.value)}</b><span>${esc(x.sub || (x.date ? x.date + (href ? ' · 전체 일정 보기' : '') : ''))}</span>`;
+    return href ? `<a class="tile${cls}" href="${esc(href)}">${inner}</a>` : `<div class="tile${cls}">${inner}</div>`;
+  }).join('')}</div>`;
+}
+
+/* ---------- 일정·D-day (dash 1.3.0): 오늘 날짜로 그때그때 계산. 설정 SCHEDULE = {start, end, tiles:[[이름, 날짜]], marks:[[이름, 날짜]]} ---------- */
+const DAY = 86400000;
+const today0 = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+const parseD = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, m - 1, d); };
+const ddays = s => Math.round((parseD(s) - today0()) / DAY);
+const ddLabel = s => { const n = ddays(s); return n > 0 ? `D-${n}` : n === 0 ? 'D-day' : `D+${-n}`; };
+function scheduleHtml() {
+  const S = DATA.schedule; if (!S || !S.start || !S.end) return '';
+  const t0 = parseD(S.start), t1 = parseD(S.end), now = today0(), tiles = S.tiles || [], marks = S.marks || [];
+  const total = Math.round((t1 - t0) / DAY), passed = Math.min(total, Math.max(0, Math.round((now - t0) / DAY)));
+  const pct = x => Math.max(0, Math.min(100, (x - t0) / (t1 - t0) * 100)).toFixed(2);
+  const next = tiles.find(([, d]) => ddays(d) >= 0);
+  return `<div class="tiles">${tiles.map(([a, d]) => { const n = ddays(d);
+      return `<div class="tile${n >= 0 && n <= 30 ? ' soon' : ''}${n < 0 ? ' done' : ''}"><span>${esc(a)}</span><b>${ddLabel(d)}</b><span>${esc(d)}</span></div>`; }).join('')}</div>
+    <div class="period" role="img" aria-label="과제 기간 ${total}일 중 ${passed}일 지남">
+      <div class="ptrack"><div class="pfill" style="width:${pct(now)}%"></div>
+        ${marks.map(([l, d]) => `<span class="pmark" style="left:${pct(parseD(d))}%" title="${esc(l)} ${esc(d)}"></span>`).join('')}
+        <span class="pnow" style="left:${pct(now)}%"></span></div>
+      <div class="plabels"><span>${esc(S.start)} 시작</span><span><b>오늘 ${passed}일째</b> / 전체 ${total}일 (${Math.round(passed / Math.max(1, total) * 100)} %)${next ? ` · 다음 기한: ${esc(next[0])} ${ddLabel(next[1])}` : ''}</span><span>${esc(S.end)} 종료</span></div>
+      <div class="plegend">${marks.map(([l, d]) => `<span><i class="pm"></i>${esc(l)} ${esc(String(d).slice(5))}</span>`).join('')}<span><i class="pn"></i>오늘</span></div>
+    </div>`;
+}
+function enhanceDates(root) {   // 표의 첫 칸이 날짜(YYYY-MM-DD)면 D-day 칩, 지난 행은 흐리게. 설정 DOCS 옵션 {"dates": True}인 문서에 씀
+  $$('td:first-child', root).forEach(td => {
+    const m = td.textContent.trim().match(/^(\d{4}-\d{2}-\d{2})(\s*무렵)?/); if (!m || td.querySelector('.dd')) return;
+    const n = ddays(m[1]); const c = document.createElement('span');
+    c.className = 'dd' + (n < 0 ? ' past' : n <= 30 ? ' soon' : '');
+    c.textContent = (m[2] ? '약 ' : '') + ddLabel(m[1]);
+    td.append(c); if (n < 0) td.parentElement.classList.add('past');
+  });
+}
+
+function renderView(v) {
+  const el = $('#view');
+  el.onclick = null;
+  if (v.special === 'notes') return renderNotesView(el);
+  if (v.special === 'files') return renderFilesView(el);
+  if (v.special === 'home') return renderHome(el);
+  if (v.special === 'search') return renderSearchView(el);
+  if (v.special === 'sums') return renderSumsView(el);
+  if (v.paper) return renderPaper(el, v);
+  const tab = currentTab[v.id] || v.tabs[0][0];
+  el.innerHTML = `<div class="vhead"><div class="kick">${esc(v.group)}</div><h1>${esc(v.title)}</h1></div>
+    <p class="hint">문장을 드래그하면 <b>질문</b>·<b>메모</b> 버튼이 뜸. 문단 왼쪽 <b>?</b> 버튼은 그 문단 전체에 대해 물음. 답은 이 화면에서 바로 오고, 질문·답·메모는 그 문단 바로 아래에 붙어 저장됨.</p>
+    ${v.notice ? `<div class="notice"><b>최신 결정</b> · ${esc(v.notice)}</div>` : ''}
+    ${v.summary ? summaryTiles() : ''}
+    ${v.schedule ? scheduleHtml() : ''}
+    ${v.card ? `<section class="card" id="cardDoc"></section>` : ''}
+    ${v.files?.length ? `<details class="files"><summary>이 논문의 파일 ${v.files.length}개 (경로 복사·Drive)</summary>${v.files.map(r => fileRow('', r, '')).join('')}</details>` : ''}
+    ${v.tabs.length > 1 ? `<div class="tabs" role="tablist">${v.tabs.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${esc(l)}</button>`).join('')}</div>` : ''}
+    <div id="docArea"></div>`;
+  if (v.card) loadDoc(v.card, $('#cardDoc'), v, true);
+  loadDoc(tab, $('#docArea'), v, false);
+  $$('.tabs button', el).forEach(b => b.onclick = () => {
+    currentTab[v.id] = b.dataset.tab;
+    $$('.tabs button', el).forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    loadDoc(b.dataset.tab, $('#docArea'), v, false);
+  });
+}
+
+const inflight = new Map();
+async function fetchDoc(key) {        // docs/<key>.html (library: 세 부분으로 나눠 docParts 에 둠). 같은 문서를 동시에 두 번 받지 않음
+  let h = docCache.get(key);
+  if (h != null) return h;
+  if (inflight.has(key)) return inflight.get(key);
+  const p = (async () => {
+    // 문서는 페이지 안 <script type="text/plain" id="doc-…">에 들어 있음 (dash 1.3.0: 새 판 게시 뒤 열어 둔 화면에서도 열림). 없으면 docs/*.html
+    let h; const emb = document.getElementById('doc-' + key);
+    if (emb) h = emb.textContent.replace(/<\\\/script/gi, '</script');
+    else { const r = await fetch('docs/' + key + '.html', {cache: 'no-store'}); if (!r.ok) throw 0; h = await r.text(); }
+    docCache.set(key, h);
+    if (LIB) {
+      const t = document.createElement('template'); t.innerHTML = h;
+      let brief = {}, sections = []; try { brief = JSON.parse(t.content.querySelector('script[data-part="brief"]')?.textContent || '{}'); } catch(e) {}
+      try { sections = JSON.parse(t.content.querySelector('script[data-part="sections"]')?.textContent || '[]'); } catch(e) {}
+      docParts.set(key, { legacy: t.content.querySelector('section[data-part="legacy"]')?.innerHTML || '',
+                          body: t.content.querySelector('section[data-part="body"]')?.innerHTML || '', brief, sections, tpl: t });
+    }
+    return h;
+  })();
+  inflight.set(key, p);
+  try { return await p; } finally { inflight.delete(key); }
+}
+async function loadDoc(key, host, v, compact, part) {
+  const m = DATA.docs[key];
+  host.innerHTML = '<p class="loading">문서를 불러오는 중…</p>';
+  let h;
+  try { h = await fetchDoc(key); }
+  catch(e) { host.innerHTML = `<p class="miss">문서(${esc(key)})를 불러오지 못함. 대시보드가 새 판으로 바뀌었을 수 있으니 페이지를 새로 고쳐(F5) 주세요.</p>`; return; }
+  if (LIB && part) {
+    h = docParts.get(key)[part];
+    if (!h.trim()) { host.innerHTML = `<p class="empty">${part === 'legacy' ? '이 논문 md에는 "📑 기존 정리본"이 없음. 위 [Claude 핵심 요약] 버튼으로 요약을 만들 수 있음.' : '본문이 비어 있음.'}</p>`; return; }
+  }
+  const head = compact || LIB ? '' : `<div class="dochead"><span>원본</span><code title="${esc(winPath(m.src))}">${esc(m.src)}</code><span>수정 ${esc(m.mtime)}</span>
+     <button class="linkbtn" data-copy="${esc(winPath(m.src))}">경로 복사</button>
+     <a class="linkbtn" href="${esc(driveUrl(m.src))}" target="_blank" rel="noopener">Drive에서 찾기</a>
+     <span>· 메모 사본</span><button class="linkbtn" data-copy="${esc(winPath(m.copy))}" title="${esc(m.copy)}">${esc(baseName(m.copy))} 경로 복사</button></div>`;
+  host.innerHTML = head + `<article class="doc" data-doc="${esc(key)}">${h}</article>`;
+  const art = $('article', host);
+  wireArticle(art, v, key);
+  if (m?.dates) enhanceDates(art);
+  if (pendingScroll) {
+    const t = art.querySelector(`.blk[data-b="${CSS.escape(pendingScroll)}"]`);
+    if (t) { pendingScroll = null; setTimeout(() => { t.scrollIntoView({block: 'center'}); t.classList.add('flash'); }, 60); }
+    else if (LIB && part) {   // 다른 부분(기존 정리본 ↔ 원문)에 있는 문단이면 그 탭으로
+      const other = part === 'body' ? 'legacy' : 'body';
+      if ((docParts.get(key)[other] || '').includes(`data-b="${pendingScroll}"`)) { currentTab[v.id] = other === 'body' ? 'body' : 'sum'; renderPaper($('#view'), v); return; }
+      pendingScroll = null;
+    }
+  }
+  if (pendingFind) {   // 검색 결과에서 온 경우: 그 말이 들어 있는 첫 문단으로
+    const q = pendingFind.toLowerCase(); pendingFind = null;
+    const t = $$('.blk', art).find(b => b.innerText.toLowerCase().includes(q));
+    if (t) setTimeout(() => { t.scrollIntoView({block: 'center'}); t.classList.add('flash'); }, 60);
+  }
+}
+
+function wireArticle(art, v, key) {   // 문단마다 ? 버튼, 노트 붙이기, 수식 조판
+  $$('.blk', art).forEach(b => {
+    blockText.set(b.dataset.b, b.innerText.trim());
+    const a = document.createElement('button'); a.className = 'ask'; a.type = 'button'; a.textContent = '?';
+    a.title = '이 문단에 질문·메모'; a.setAttribute('aria-label', '이 문단에 질문하거나 메모 남기기');
+    a.onclick = () => openComposer(b, '', v.id, key);
+    b.prepend(a);
+  });
+  placeThreads(art);
+  typeset(art);
+}
+
+/* ---------- 노트를 문단 아래에 놓기 ---------- */
+function threadsFor(bid) { return [...threads.values()].filter(t => t.block === bid).sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || '')); }
+function placeThreads(root) {
+  $$('.thread:not(.live)', root).forEach(x => x.remove());
+  $$('.blk', root).forEach(b => {
+    const list = threadsFor(b.dataset.b);
+    b.classList.toggle('noted', list.length > 0);
+    let after = b;
+    while (after.nextElementSibling?.classList.contains('thread')) after = after.nextElementSibling;
+    list.forEach(t => {
+      if (document.querySelector(`.thread.live[data-t="${t.id}"]`)) return;
+      const card = threadCard(t); after.after(card); after = card; typeset(card);
+    });
+  });
+  // 문서 전체에 단 노트 (block = "_doc:<key>") — 요청 카드(data-nodoc)에는 안 붙임
+  $$('article.doc:not([data-nodoc])', root.closest('#view') || root).forEach(art => {
+    const key = art.dataset.doc, holder = art.querySelector(':scope > .docnotes') || (() => { const d = document.createElement('div'); d.className = 'docnotes'; art.prepend(d); return d; })();
+    holder.innerHTML = '';
+    threadsFor('_doc:' + key).forEach(t => { if (!document.querySelector(`.thread.live[data-t="${t.id}"]`)) { const c = threadCard(t); holder.append(c); typeset(c); } });
+  });
+  applyNoteVisibility();
+}
+function refreshNotes() {
+  renderStatus(); renderNav();
+  if (VIEWS[currentView]?.special === 'notes') return renderNotesView($('#view'));
+  $$('#view article.doc').forEach(a => placeThreads(a));
+}
+const fmt = iso => { try { const d = new Date(iso); return `${d.getMonth() + 1}-${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; } catch(e) { return ''; } };
+
+function threadCard(t0) {
+  'use strict';
+  const t = JSON.parse(JSON.stringify(t0));   // 고칠 수 있는 사본 (원본이 얼려져 있어도 안전)
+  const el = document.createElement('div'); el.className = 'thread'; el.dataset.t = t.id;
+  const turns = t.turns || [];
+  el.innerHTML = `<div class="th-top"><span class="tag">${turns.length ? `질문 ${turns.length}` + (t.memo ? ' · 메모' : '') : '메모'}</span>
+      <span class="when">${esc(fmt(t.updatedAt || t.createdAt))}</span><span class="sp"></span>
+      ${t.memo ? '' : '<button class="btn ghost" data-act="edit">메모 쓰기</button>'}
+      <button class="btn ghost" data-act="del" title="이 묶음의 질문·답·메모를 모두 지움">전체 삭제</button></div>
+    ${t.quote ? `<div class="quote">“${esc(t.quote)}”</div>` : ''}
+    ${turns.map((u, i) => `<details class="turn" data-i="${i}"${i === turns.length - 1 && !t.memo ? ' open' : ''}><summary>Q. ${esc(u.q)}${u.editedAt ? ' <span class="edited">(고침)</span>' : ''}${u.tier ? ` <span class="edited">· ${esc(TIER_NAME[u.tier] || u.tier)}</span>` : ''}</summary>
+      <div class="ans">${mdLite(u.a)}</div>
+      <div class="tact"><button class="linkbtn" data-act="tq" data-i="${i}">질문 고치기</button><button class="linkbtn" data-act="ta" data-i="${i}">답 고치기</button>
+        <button class="linkbtn" data-act="tre" data-i="${i}">다시 묻기</button><button class="linkbtn danger" data-act="tdel" data-i="${i}">이 질문 삭제</button></div></details>`).join('')}
+    ${t.memo ? `<div class="memo"><div class="lab">내 메모${t.memoEditedAt ? ' <span class="edited">(고침)</span>' : ''}</div><div class="body">${mdLite(t.memo)}</div>
+      <div class="tact"><button class="linkbtn" data-act="edit">메모 고치기</button><button class="linkbtn danger" data-act="mdel">메모 삭제</button></div></div>` : ''}
+    <div class="followup"><input type="text" placeholder="이어서 묻기 (Enter)" aria-label="이어서 묻기"><button class="btn" data-act="more">묻기</button></div>`;
+  el.addEventListener('click', e => {
+    const a = e.target.closest('[data-act]')?.dataset.act; if (!a) return;
+    const cur = JSON.parse(JSON.stringify(threads.get(t.id) || t));   // 그사이 바뀐 최신본 기준으로
+    const b = e.target.closest('button'), i = +b.dataset.i;
+    // 지우는 버튼은 두 번 눌러야 지워짐 (첫 번째는 "정말 …?"로 바뀜)
+    const armed = () => { if (b.dataset.armed) return true; const old = b.textContent; b.dataset.armed = '1'; b.textContent = '정말 지울까요? 한 번 더'; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = old; } }, 3000); return false; };
+    if (a === 'more') followUp(el, cur);
+    if (a === 'edit') editMemo(el, cur);
+    if (a === 'del' && armed()) delThread(t.id);
+    if (a === 'mdel' && armed()) { cur.memo = ''; delete cur.memoEditedAt; saveOrDrop(cur).then(() => toast('메모 지움')); }
+    if (a === 'tdel' && armed()) { cur.turns.splice(i, 1); saveOrDrop(cur).then(() => toast('질문 하나 지움')); }
+    if (a === 'tq' || a === 'ta') editTurn(el, cur, i, a === 'tq' ? 'q' : 'a');
+    if (a === 'tre') editTurn(el, cur, i, 'q', true);
+  });
+  $('input', el).addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) followUp(el, JSON.parse(JSON.stringify(threads.get(t.id) || t))); });
+  return el;   // 수식 조판은 문서에 붙인 뒤에 (붙이기 전에 하면 크기를 못 재서 글자가 거대해짐)
+}
+
+/* ---------- 질문 만들기 ---------- */
+function newId() { return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function sectionPath(blk) {
+  const path = []; let lv = 9; let e = blk;
+  while ((e = e.previousElementSibling)) {
+    const h = e.matches('.k-h') ? e.querySelector('h1,h2,h3,h4') : null;
+    if (h) { const l = +h.tagName[1]; if (l < lv) { path.unshift(h.innerText.trim()); lv = l; if (l <= 1) break; } }
+  }
+  return path.join(' › ');
+}
+function contextOf(blk) {
+  const take = (el, n, dir) => { const out = []; let e = el; while (out.length < n && (e = dir ? e.nextElementSibling : e.previousElementSibling)) if (e.matches('.blk')) out.push((blockText.get(e.dataset.b) || '').slice(0, 1400)); return dir ? out : out.reverse(); };
+  return { before: take(blk, 4, false).join('\n\n'), after: take(blk, 2, true).join('\n\n') };
+}
+const RULES = DATA.rules;   // 설정 파일의 RULES (질문 도우미 규칙)
+function buildInput(t, q) {
+  const head = `${RULES}
+
+[문서] ${t.docTitle}
+[위치] ${t.section || '(문서 처음)'}
+${t.quote ? `[사용자가 선택한 문장]\n${t.quote}\n` : ''}
+[해당 문단]
+${(t.blockText || '').slice(0, 4000)}
+
+[앞 문맥]
+${(t.ctxBefore || '').slice(0, 5000)}
+
+[뒤 문맥]
+${(t.ctxAfter || '').slice(0, 2500)}`;
+  const turns = t.turns || [];
+  if (!turns.length) return [{role: 'user', content: head + '\n\n질문: ' + q}];
+  const msgs = [{role: 'user', content: head + '\n\n질문: ' + turns[0].q}];
+  turns.forEach((u, i) => { if (i) msgs.push({role: 'user', content: u.q}); msgs.push({role: 'assistant', content: u.a || '(답 없음)'}); });
+  msgs.push({role: 'user', content: q});
+  return msgs;
+}
+const ERR = {not_granted: '이 페이지에서 Claude 사용이 허용되지 않았음 (페이지 권한에서 켤 수 있음).', sampling_disabled: '이 계정에서는 Claude 호출을 쓸 수 없음.',
+  rate_limited: '요청이 많아 잠시 막혔음. 조금 뒤 다시 물어보세요.', prompt_too_large: '보내는 문맥이 너무 김. 더 짧은 부분을 선택해 주세요.',
+  session_expired: '다시 로그인해야 함.', refused: 'Claude가 이 질문에 답하지 않았음. 질문을 바꿔 보세요.', cancelled: '멈춤.'};
+
+function openComposer(blk, quote, viewId, docKey, wholeDoc) {
+  $$('.thread.live.draft').forEach(x => x.remove());
+  const m = DATA.docs[docKey];
+  const ctx = wholeDoc ? {before: '', after: ''} : contextOf(blk);
+  const wholeText = () => LIB && docParts.get(docKey)?.brief?.abstract ? briefText(docParts.get(docKey).brief).slice(0, 12000)
+    : [...$$('.blk', blk.closest('article'))].slice(0, 60).map(b => blockText.get(b.dataset.b) || '').join('\n\n').slice(0, 9000);
+  const t = { id: newId(), view: viewId, tab: docKey, doc: docKey, docTitle: m.title, src: m.src,
+    block: wholeDoc ? '_doc:' + docKey : blk.dataset.b, section: wholeDoc ? '' : sectionPath(blk), quote: quote || '',
+    blockText: wholeDoc ? wholeText() : (blockText.get(blk.dataset.b) || ''),
+    ctxBefore: ctx.before, ctxAfter: ctx.after, turns: [], memo: '', createdAt: new Date().toISOString() };
+  const el = document.createElement('div'); el.className = 'thread live draft'; el.dataset.t = t.id;
+  el.innerHTML = `<div class="th-top"><span class="tag">${wholeDoc ? '문서 전체에 새 질문' : '새 질문·메모'}</span><span class="sp"></span><button class="btn ghost" data-x>닫기</button></div>
+    ${t.quote ? `<div class="quote">“${esc(t.quote)}”</div>` : ''}
+    <label class="lab" for="q-${t.id}" style="font-size:12px;color:var(--note);font-weight:600">무엇이 궁금한가요? (메모만 남겨도 됨)</label>
+    <textarea id="q-${t.id}" placeholder="${esc(DATA.askExample || '예: 이 식이 왜 이렇게 되는지 쉽게 설명해 줘')}"></textarea>
+    <div class="row"><button class="btn pri" data-go>Claude에게 묻기</button><button class="btn note" data-memo>메모로 저장</button><span class="msg"></span></div>`;
+  if (wholeDoc) blk.closest('article').prepend(el); else { let after = blk; while (after.nextElementSibling?.classList.contains('thread')) after = after.nextElementSibling; after.after(el); }
+  const ta = $('textarea', el); ta.focus();
+  $('[data-x]', el).onclick = () => el.remove();
+  $('[data-memo]', el).onclick = () => {
+    const v = ta.value.trim(); if (!v) { $('.msg', el).textContent = '메모 내용을 먼저 적어 주세요.'; return; }
+    t.memo = v; t.memoAt = new Date().toISOString(); el.remove(); putThread(t).then(() => toast('메모 저장함')); refreshNotes();
+  };
+  $('[data-go]', el).onclick = () => {
+    const q = ta.value.trim(); if (!q) { $('.msg', el).textContent = '질문을 먼저 적어 주세요.'; ta.focus(); return; }
+    runAsk(el, t, q, true);
+  };
+  ta.addEventListener('input', () => { $('.msg', el).textContent = ''; });
+}
+
+async function runAsk(el, t, q, isNew) {
+  if (!sampleFn) { toast('이 화면에서는 Claude에 물을 수 없음 (claude.ai에서 열어야 함). 메모로 저장은 됨.'); return; }
+  el.classList.add('live');
+  const area = document.createElement('div');
+  area.innerHTML = `<details class="turn" open><summary>Q. ${esc(q)}</summary><div class="ans streaming">생각하는 중…</div></details>
+    <div class="row"><button class="btn" data-stop>멈추기</button><span class="msg"></span></div>`;
+  if (isNew) { $$('textarea, .row', el).forEach(x => x.remove()); $('label', el)?.remove(); el.append(area); }
+  else el.querySelector('.followup').before(area);
+  const ans = $('.ans', area), ctl = new AbortController();
+  $('[data-stop]', area).onclick = () => ctl.abort();
+  try {
+    const r = await sampleFn(buildInput(t, q), askOpts({ signal: ctl.signal, onText: ({text}) => { ans.textContent = text; } }));
+    t.turns = [...(t.turns || []), { q, a: r.text, at: new Date().toISOString(), cut: !!r.truncated, tier: r.modelTierApplied || askTier }];
+    ans.classList.remove('streaming'); ans.innerHTML = mdLite(r.text); typeset(ans);
+    await putThread(t);
+    $('.row', area)?.remove();
+    el.classList.remove('live', 'draft');
+    refreshNotes();
+  } catch(e) {
+    const keep = e?.text;
+    ans.classList.remove('streaming');
+    ans.innerHTML = keep ? mdLite(keep) + '<p class="miss">(답이 중간에 끊김)</p>' : '';
+    $('.msg', area).className = 'err'; $('.msg', area).textContent = ERR[e?.code] || ('답을 받지 못함 (' + (e?.code || '오류') + '). 다시 물어보세요.');
+    $('[data-stop]', area).remove();
+    if (keep) { t.turns = [...(t.turns || []), { q, a: keep + '\n\n(답이 중간에 끊김)', at: new Date().toISOString(), cut: true }]; await putThread(t); }
+    el.classList.remove('live');
+  }
+}
+/* 질문·답·메모를 하나씩 고치고 지우기 */
+function saveOrDrop(t) {           // 질문도 메모도 남지 않으면 묶음째 지움
+  if (!(t.turns || []).length && !t.memo) { delThread(t.id); return Promise.resolve(); }
+  return putThread(t).then(() => refreshNotes());
+}
+function editTurn(el, t, i, field, reask) {
+  const det = el.querySelector(`details.turn[data-i="${i}"]`); if (!det || !t.turns?.[i]) return;
+  el.classList.add('live'); det.open = true;
+  $('.tact', det).hidden = true;
+  const box = document.createElement('div'); box.className = 'tedit';
+  const isQ = field === 'q';
+  box.innerHTML = `<div class="lab">${isQ ? (reask ? '질문을 다듬어 다시 묻기 (이 질문의 답만 새로 받음)' : '질문 고치기') : '답 고치기 (마크다운·수식 가능)'}</div>
+    <textarea>${esc(t.turns[i][field] || '')}</textarea>
+    <div class="row">${isQ ? (reask ? '<button class="btn pri" data-go>다시 묻기</button>' : '<button class="btn pri" data-save>저장</button><button class="btn" data-go>저장하고 다시 묻기</button>') : '<button class="btn pri" data-save>저장</button>'}
+    <button class="btn ghost" data-cancel>취소</button><span class="msg"></span></div>`;
+  det.append(box);
+  const ta = $('textarea', box); ta.focus();
+  const done = () => { el.classList.remove('live'); refreshNotes(); };
+  $('[data-cancel]', box).onclick = done;
+  const sv = $('[data-save]', box);
+  if (sv) sv.onclick = async () => {
+    const v = ta.value.trim(); if (!v) { $('.msg', box).textContent = isQ ? '질문이 비었음. 지우려면 "이 질문 삭제"를 쓰세요.' : '답이 비었음.'; return; }
+    t.turns[i][field] = v; t.turns[i].editedAt = new Date().toISOString();
+    sv.disabled = true; await putThread(t); done(); toast(isQ ? '질문 고침' : '답 고침');
+  };
+  const go = $('[data-go]', box);
+  if (go) go.onclick = async () => {
+    const q = ta.value.trim(); if (!q) { $('.msg', box).textContent = '질문을 적어 주세요.'; return; }
+    if (!sampleFn) { $('.msg', box).textContent = '이 화면에서는 Claude에 물을 수 없음.'; return; }
+    go.disabled = true; sv && (sv.disabled = true);
+    const ans = $('.ans', det), ctl = new AbortController();
+    $('.msg', box).innerHTML = '<button class="btn" data-stop>멈추기</button>'; $('[data-stop]', box).onclick = () => ctl.abort();
+    ans.classList.add('streaming'); ans.textContent = '생각하는 중…';
+    try {   // 이 질문 앞까지의 대화만 문맥으로 보냄
+      const r = await sampleFn(buildInput({ ...t, turns: t.turns.slice(0, i) }, q), askOpts({ signal: ctl.signal, onText: ({text}) => { ans.textContent = text; } }));
+      t.turns[i] = { q, a: r.text, at: new Date().toISOString(), cut: !!r.truncated, tier: r.modelTierApplied || askTier, ...(i < t.turns.length - 1 ? { note: '뒤 질문들은 이전 답을 보고 물은 것' } : {}) };
+      await putThread(t); toast('새 답으로 바꿈'); done();
+    } catch(e) {
+      ans.classList.remove('streaming'); ans.innerHTML = mdLite(t.turns[i].a);
+      $('.msg', box).className = 'err'; $('.msg', box).textContent = (ERR[e?.code] || '답을 받지 못함') + ' 이전 답은 그대로 둠.';
+      go.disabled = false; sv && (sv.disabled = false);
+    }
+  };
+}
+function followUp(el, t) {
+  const inp = $('.followup input', el), q = inp.value.trim(); if (!q) { inp.focus(); return; }
+  inp.value = ''; runAsk(el, t, q, false);
+}
+function editMemo(el, t) {
+  el.classList.add('live');
+  $('.memo', el)?.remove();
+  const box = document.createElement('div'); box.className = 'memo';
+  const last = (t.turns || []).slice(-1)[0];
+  box.innerHTML = `<div class="lab">내 메모 — 내 말로 정리 (마크다운·수식 가능)</div><textarea>${esc(t.memo || '')}</textarea>
+    <div class="row"><button class="btn pri" data-save>메모 저장</button>
+    ${last ? '<button class="btn" data-draft>답을 3줄로 줄여 초안 넣기</button>' : ''}<button class="btn ghost" data-cancel>취소</button><span class="msg"></span></div>`;
+  el.querySelector('.followup').before(box);
+  const ta = $('textarea', box); ta.focus();
+  $('[data-cancel]', box).onclick = () => { el.classList.remove('live'); refreshNotes(); };
+  $('[data-save]', box).onclick = async () => {
+    const had = !!t.memo;
+    t.memo = ta.value.trim(); t.memoAt = new Date().toISOString(); if (had) t.memoEditedAt = t.memoAt;
+    if (!t.memo && !(t.turns || []).length) { delThread(t.id); return; }
+    $('[data-save]', box).disabled = true; $('.msg', box).textContent = '저장하는 중…';
+    await putThread(t);
+    if (threads.get(t.id)?.memo !== t.memo) { $('.msg', box).textContent = '저장이 확인되지 않음. 다시 눌러 주세요.'; $('[data-save]', box).disabled = false; return; }
+    el.classList.remove('live'); refreshNotes(); toast('메모 저장함');
+  };
+  const d = $('[data-draft]', box);
+  if (d) d.onclick = async () => {
+    if (!sampleFn) { $('.msg', box).textContent = 'Claude를 부를 수 없는 화면임.'; return; }
+    d.disabled = true; $('.msg', box).textContent = '줄이는 중…';
+    try {
+      const qa = (t.turns || []).map(u => `Q. ${u.q}\nA. ${u.a}`).join('\n\n').slice(0, 12000);
+      const r = await sampleFn(`다음 질의응답을, 사용자가 보고서 본문 옆에 붙여 둘 개인 메모로 2–4줄 요약해라. 한국어 음슴체(~임, ~함), 핵심 수식이나 수치가 있으면 그대로 남기고 다른 말은 쓰지 마라.\n\n[본문 문단]\n${(t.blockText || '').slice(0, 2000)}\n\n[질의응답]\n${qa}`, { modelTier: 'quick', cache: false });
+      ta.value = (ta.value ? ta.value + '\n\n' : '') + r.text.trim(); $('.msg', box).textContent = '초안을 넣었음. 고친 뒤 저장하세요.';
+    } catch(e) { $('.msg', box).textContent = ERR[e?.code] || '초안을 만들지 못함.'; }
+    d.disabled = false;
+  };
+}
+
+/* ---------- 문장 선택 도구 ---------- */
+let tool = null;
+function hideTool() { tool?.remove(); tool = null; }
+document.addEventListener('mouseup', () => setTimeout(showTool, 0));
+document.addEventListener('keyup', e => { if (e.shiftKey) setTimeout(showTool, 0); });
+document.addEventListener('selectionchange', () => { if (!document.getSelection()?.toString().trim()) setTimeout(() => { if (!document.getSelection()?.toString().trim()) hideTool(); }, 200); });
+function showTool() {
+  const sel = document.getSelection(); const txt = sel?.toString().trim();
+  if (!txt || sel.rangeCount === 0) return;
+  const node = sel.anchorNode?.nodeType === 1 ? sel.anchorNode : sel.anchorNode?.parentElement;
+  const blk = node?.closest('article.doc .blk'); if (!blk || blk.closest('.thread')) return;
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  hideTool();
+  tool = document.createElement('div'); tool.className = 'seltool';
+  tool.innerHTML = '<button data-q>질문</button><button data-m>메모</button>';
+  tool.style.top = (rect.top + window.scrollY - 44) + 'px';
+  tool.style.left = Math.max(8, Math.min(rect.left + window.scrollX + rect.width / 2 - 60, document.documentElement.clientWidth - 140)) + 'px';
+  document.body.append(tool);
+  const art = blk.closest('article.doc');
+  const go = memoOnly => { const q = txt.slice(0, 1500); hideTool(); sel.removeAllRanges(); openComposer(blk, q, currentView, art.dataset.doc); if (memoOnly) $('.thread.draft textarea')?.setAttribute('placeholder', '이 문장에 대한 내 메모'); };
+  tool.addEventListener('mousedown', e => e.preventDefault());
+  $('[data-q]', tool).onclick = () => go(false);
+  $('[data-m]', tool).onclick = () => go(true);
+}
+$('#askDocBtn').onclick = () => {
+  const art = $('#docArea article.doc') || $('#view article.doc');
+  if (!art) { toast('문서를 연 화면에서 쓰세요.'); return; }
+  openComposer(art.querySelector('.blk') || art, '', currentView, art.dataset.doc, true);
+  art.scrollIntoView({block: 'start'});
+};
+
+/* ---------- 노트 동기화 요청 ----------
+   1) db meta/syncRequest 에 요청을 남김 (세션이 닫혀 있어도 다음에 처리할 수 있게)
+   2) 이 대시보드를 지켜보는 Claude 세션이 있으면 댓글로 "Send to Claude" → 그 세션이 dash_notes_sync.py 를 돌리고
+      meta/sync 를 갱신함 → 위 상태 줄과 알림이 바뀜 */
+$('#syncBtn').onclick = async () => {
+  const btn = $('#syncBtn');
+  if (!dbLive) { toast('노트 저장소에 연결된 화면(claude.ai)에서만 쓸 수 있음.'); return; }
+  btn.disabled = true;
+  const n = threads.size, now = new Date().toISOString();
+  try { await store.doc('meta/syncRequest').set({ requestedAt: now, count: n, sums: sums.size }); }
+  catch(e) { toast('요청을 남기지 못함 (' + (e.code || '오류') + ')'); btn.disabled = false; return; }
+  let sent = false, why = '';
+  try {
+    const cm = await window.claude?.use?.('comments');
+    const st = cm ? await cm.canSendToClaude().catch(() => 'off') : 'off';
+    if (st === 'available') {
+      const anchor = await cm.anchorFor(btn);
+      await cm.sendToClaude({ anchor, text: `노트 동기화 요청 (대시보드 버튼, ${fmt(now)}) — 질문·메모 ${n}건${LIB ? `과 Claude 요약 ${sums.size}편` : ''}을 원본 md 사본(${DATA.noteDir})에 반영해 주세요. 절차: artifact-board 스킬 SKILL.md "연구 대시보드 · 노트 동기화" (설정: ${DATA.config})` });
+      sent = true;
+    } else why = st === 'no_session' ? '지금 이 대시보드를 지켜보는 Claude 세션이 없음' : '이 화면에서는 Claude에게 바로 보낼 수 없음';
+  } catch(e) { why = e?.code === 'consent_required' ? '댓글 쓰기 허락이 필요함 (다시 누르면 허락 창이 뜸)' : '보내지 못함 (' + (e?.code || '오류') + ')'; }
+  toast(sent ? 'Claude에게 동기화를 요청함. 반영되면 위 상태 줄 시각이 바뀜 (보통 1–3분).'
+             : why + '. 요청은 남겨 둠 — Claude 채팅에서 "노트 동기화"라고 하면 처리함.');
+  setTimeout(() => { btn.disabled = false; }, 4000);
+};
+
+/* ---------- 노트 모음 ---------- */
+function renderNotesView(el) {
+  const prevQ = $('#nsearch', el)?.value || '';
+  const list = [...threads.values()].sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  const groups = {};
+  list.forEach(t => { (groups[t.docTitle || '기타'] ||= []).push(t); });
+  el.innerHTML = `<div class="vhead"><div class="kick">정리</div><h1>내 질문·메모 모음</h1></div>
+    <p class="hint">대시보드에서 묻고 답 받고 메모한 것 전부. "본문에서 보기"를 누르면 그 문단으로 감. md 사본 위치: <code>${esc(DATA.noteDir)}/</code>
+    <button class="linkbtn" data-copy="${esc(winPath(DATA.noteDir))}">폴더 경로 복사</button></p>
+    <input class="search" id="nsearch" placeholder="질문·답·메모에서 찾기" value="${esc(prevQ)}" aria-label="노트 검색">
+    <div id="nlist"></div>`;
+  const draw = () => {
+    const q = $('#nsearch', el).value.trim().toLowerCase();
+    const hit = t => !q || JSON.stringify([t.quote, t.memo, t.turns, t.section]).toLowerCase().includes(q);
+    const html = Object.entries(groups).map(([doc, ts]) => {
+      const f = ts.filter(hit); if (!f.length) return '';
+      return `<h2 style="font-family:var(--f-title);font-size:18px;margin:22px 0 4px">${esc(doc)}</h2>` + f.map(t => `<div class="nitem">
+        <div class="where">${esc(VIEWS[t.view]?.title || '')}${t.section ? ' › ' + esc(t.section) : ''} · ${esc(fmt(t.updatedAt))}</div>
+        ${t.quote ? `<div class="quote">“${esc(t.quote.slice(0, 300))}”</div>` : ''}
+        ${(t.turns || []).length ? `<ul class="qs">${t.turns.map(u => `<li>${esc(u.q)}</li>`).join('')}</ul>` : ''}
+        ${t.memo ? `<div class="mm">${mdLite(t.memo)}</div>` : ''}
+        <div class="row"><button class="btn" data-goto="${esc(t.id)}">본문에서 보기</button></div></div>`).join('');
+    }).join('');
+    $('#nlist', el).innerHTML = html || `<div class="empty">아직 질문·메모가 없음. 아무 문서에서 문장을 드래그해 <b>질문</b>을 누르거나, 문단 왼쪽 <b>?</b>를 눌러 시작하세요.</div>`;
+    typeset($('#nlist', el));
+  };
+  $('#nsearch', el).oninput = draw; draw();
+  el.onclick = e => {
+    const id = e.target.closest('[data-goto]')?.dataset.goto; if (!id) return;
+    const t = threads.get(id); if (!t) return;
+    currentTab[t.view] = VIEWS[t.view]?.paper ? ((LIB?.lite || t.block.startsWith('sum:')) ? 'sum' : 'body') : t.tab; pendingScroll = t.block.startsWith('_doc:') ? null : t.block;
+    if (location.hash === '#' + t.view) route(); else location.hash = t.view;
+  };
+}
+function renderFilesView(el) {
+  el.onclick = null;
+  const docs = Object.entries(DATA.docs);
+  const seen = new Set();
+  const src = docs.filter(([k, m]) => !seen.has(m.src) && seen.add(m.src));
+  setTimeout(() => { const b = $('#chkBtn'); if (b) b.onclick = () => { b.disabled = true; selfCheck($('#chkOut')).finally(() => { b.disabled = false; }); }; }, 0);
+  el.innerHTML = `<div class="vhead"><div class="kick">정리</div><h1>파일 위치 · 점검</h1></div>
+    <div class="row" style="margin:0 0 6px"><button class="btn pri" id="chkBtn">대시보드 전체 점검</button><span class="msg">${LIB ? '저장소·Claude 연결·목록을 확인함 (서재는 논문이 많아 문서·그림 전수 점검은 하지 않음)' : '문서·그림·저장소·Claude 연결을 모두 확인함 (1분 안팎)'}</span></div>
+    <div id="chkOut" style="margin-bottom:18px"></div>
+    <p class="hint">"경로 복사"는 Windows 전체 경로를 복사함 (탐색기 주소창에 붙여 넣으면 열림). "Drive에서 찾기"는 Google Drive에서 같은 이름의 파일을 검색함. 브라우저 보안 때문에 이 페이지에서 내 PC 파일을 바로 열 수는 없음.</p>
+    <h2 style="font-family:var(--f-title);font-size:18px">대시보드에 들어 있는 문서의 원본</h2>
+    <div class="files" style="border-style:solid">${src.map(([k, m]) => fileRow(m.title, m.src, m.mtime)).join('')}</div>
+    <h2 style="font-family:var(--f-title);font-size:18px">투고본·Word·보고 자료</h2>
+    <div class="files" style="border-style:solid">${DATA.files.map(([l, r, w]) => fileRow(l, r, w)).join('')}</div>
+    <h2 style="font-family:var(--f-title);font-size:18px">질문·메모가 들어간 md 사본</h2>
+    <div class="files" style="border-style:solid">${LIB ? `<div class="frow"><span class="t">사본 폴더</span><code>${esc(DATA.noteDirWin)}</code><button class="linkbtn" data-copy="${esc(DATA.noteDirWin)}">경로 복사</button></div>
+      <div class="frow"><span class="t">Claude 요약 md</span><code>${esc(DATA.sumDirWin)}</code><button class="linkbtn" data-copy="${esc(DATA.sumDirWin)}">경로 복사</button></div>
+      <p class="hint" style="margin:6px 0 0">사본은 "노트 동기화"를 할 때 질문·메모·요약이 있는 논문만 만들어짐 (원본 md 이름 + "__노트.md" / "__요약.md").</p>` : fileRow('사본 폴더', DATA.noteDir, '') + src.map(([k, m]) => fileRow(m.title, m.copy, '')).join('')}</div>`;
+}
+
+/* ==================== 논문 서재 (library) ==================== */
+const hl = (s, q) => { s = esc(s); if (!q) return s; const toks = q.toLowerCase().split(/\s+/).filter(Boolean); toks.forEach(t => { s = s.replace(new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), m => '<mark>' + m + '</mark>'); }); return s; };
+const pHay = p => [p.t, p.a, p.y, p.j, p.doi, p.folder, (p.tags || []).join(' '), p.ex || ''].join(' ').toLowerCase();
+function metaMatch(p, q) { const toks = q.toLowerCase().split(/\s+/).filter(Boolean); if (!toks.length) return true; const h = pHay(p); return toks.every(t => h.includes(t)); }
+function chipsOf(p) {
+  const c = [];
+  if (sums.has(p.k)) c.push(['ac', 'Claude 요약']);
+  if (p.legacy) c.push(['ok', 'md 요약 있음']); else c.push(['warn', 'md 요약 없음']);
+  if (p.st?.tr) c.push([/완료/.test(p.st.tr) ? 'ok' : '', '번역 ' + p.st.tr.replace('진행 ', '')]);
+  if (p.nfig) c.push(['', `그림·표 ${p.nfig}`]);
+  if (!p.p2m) c.push(['', 'pdf2md 아님']);
+  return c;
+}
+const chipHtml = c => `<span class="chip ${c[0]}">${esc(c[1])}</span>`;
+
+/* 왼쪽 트리 */
+function renderTree(cnt) {
+  const nav = $('#nav'), q = ($('#psearch').value || '').trim();
+  const open = new Set($$('details[open]', nav).map(d => d.dataset.path));
+  const cur = VIEWS[currentView]?.paper?.folder || '';
+  const fixed = DATA.views[0].items.map(it => `<a href="#${it.id}" data-v="${it.id}"${it.id === currentView ? ' aria-current="page"' : ''}><span>${esc(it.title)}</span>${it.id === 'notes' && threads.size ? `<span class="cnt">${threads.size}</span>` : it.id === 'sums' && sums.size ? `<span class="cnt" style="background:var(--accent-soft);color:var(--accent);border-color:transparent">${sums.size}</span>` : ''}</a>`).join('');
+  const paper = k => { const p = PAPERS[k]; if (q && !metaMatch(p, q)) return ''; const n = cnt['p-' + k] || 0;
+    return `<a class="pp" href="#p-${k}" data-v="p-${k}"${'p-' + k === currentView ? ' aria-current="page"' : ''} title="${esc(p.t)}${p.a ? ' — ' + esc(p.a) : ''}"><span class="y">${esc(p.y || '----')}</span><span class="tt">${esc(p.t)}</span>${sums.has(k) ? '<span class="mk" title="Claude 요약 있음">★</span>' : ''}${n ? `<span class="cnt" title="질문·메모">${n}</span>` : ''}</a>`; };
+  const count = node => (node._p || []).length + Object.values(node._d || {}).reduce((s, x) => s + count(x), 0);
+  const walk = (node, path) => {
+    const subs = Object.entries(node._d || {}).map(([name, ch]) => { const inner = walk(ch, path ? path + '/' + name : name); if (!inner.trim()) return '';
+      const pth = path ? path + '/' + name : name, isOpen = q || open.has(pth) || (cur && (cur === pth || cur.startsWith(pth + '/')));
+      return `<details data-path="${esc(pth)}"${isOpen ? ' open' : ''}><summary><span>${esc(name)}</span><span class="n">${count(ch)}</span></summary><div class="sub">${inner}</div></details>`; }).join('');
+    return subs + (node._p || []).map(paper).join('');
+  };
+  const treeHtml = walk(LIB.tree, '');
+  nav.innerHTML = `<h4>정리</h4>${fixed}<h4>논문 ${LIB.papers.length}편${q ? ' · 걸러짐' : ''}</h4><div class="tree">${treeHtml || '<p class="miss">맞는 논문이 없음</p>'}</div>`;
+}
+$('#psearch').hidden = !LIB;
+if (LIB) {
+  let tm = null;
+  $('#psearch').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(() => renderNav(), 120); });
+  $('#psearch').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { searchQ = $('#psearch').value.trim(); if (location.hash === '#search') renderSearchView($('#view')); else location.hash = 'search'; $('#side').classList.remove('open'); } });
+}
+
+/* 첫 화면 */
+function renderHome(el) {
+  const recent = [...LIB.papers].sort((a, b) => (b.mtime || '').localeCompare(a.mtime || '')).slice(0, 15);
+  el.innerHTML = `<div class="vhead"><div class="kick">논문 서재</div><h1>${esc(DATA.title)}</h1></div>
+    <p class="hint">왼쪽에서 논문을 고르거나 검색창에 제목·저자·연도·태그를 치면 목록이 걸러짐 (Enter: 결과 화면, 본문까지 찾기 가능). 논문 화면의 <b>요약</b> 탭에서 [Claude 핵심 요약]을 누르면 한글 요약과 그림이 만들어져 저장됨. 요약 문장을 드래그하거나 문단 왼쪽 <b>?</b>로 질문·메모.${LIB.lite ? ' 이 서재는 가벼운 모드라 원문 전체는 싣지 않음 (원문은 md·PDF 파일로).' : ''}</p>
+    ${summaryTiles()}
+    <h2 style="font-family:var(--f-title);font-size:18px;margin:18px 0 4px">최근 바뀐 논문 md</h2>
+    <ul class="recent">${recent.map(p => `<li><span class="y">${esc(p.y)}</span><a href="#p-${p.k}">${esc(p.t)}</a><span class="m">${esc(p.mtime)}</span></li>`).join('')}</ul>
+    <p class="hint" style="margin-top:14px">원본 폴더: <code>${esc(DATA.winRoot)}</code> <button class="linkbtn" data-copy="${esc(DATA.winRoot)}">경로 복사</button> · 생성 ${esc(DATA.built)}</p>`;
+}
+
+/* 논문 화면 */
+function renderPaper(el, v) {
+  const p = v.paper, tabs = [['sum', '요약']].concat(LIB.lite ? [] : [['body', '원문·번역']]).concat(LIB.figsTab ? [['figs', `그림·표${p.nfig ? ' ' + p.nfig : ''}`]] : []);
+  let tab = currentTab[v.id] || 'sum'; if (tab !== 'qa' && !tabs.some(t => t[0] === tab)) tab = 'sum';
+  const nq = [...threads.values()].filter(t => t.doc === p.k).length;
+  const pdf = p.pdf || p.rel.replace(/\.md$/, '.pdf');
+  el.innerHTML = `<div class="vhead"><div class="kick">${esc(p.folder)}</div><h1>${esc(p.t)}</h1></div>
+    <div class="pmeta">${esc([p.a, p.j, p.y].filter(Boolean).join(' · '))}${p.doi ? ` · <a href="${esc(/^http/.test(p.doi) ? p.doi : 'https://doi.org/' + p.doi)}" target="_blank" rel="noopener">DOI</a>` : ''}</div>
+    <div class="chips">${chipsOf(p).map(chipHtml).join('')}${(p.tags || []).map(t => `<span class="chip tag">${esc(t)}</span>`).join('')}</div>
+    <details class="files"><summary>파일 (md · PDF · 사본 경로)</summary>${fileRow('md', p.rel, p.mtime)}${fileRow('PDF', pdf, '')}
+      <div class="frow"><span class="t">노트 사본</span><code>${esc(DATA.noteDirWin + '\\' + baseName(DATA.docs[p.k].copy))}</code><button class="linkbtn" data-copy="${esc(DATA.noteDirWin + '\\' + baseName(DATA.docs[p.k].copy))}">경로 복사</button></div></details>
+    <div class="tabs" role="tablist">${tabs.concat([['qa', `질문·메모${nq ? ' ' + nq : ''}`]]).map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${esc(l)}</button>`).join('')}</div>
+    <div id="sumHost" ${tab === 'sum' ? '' : 'hidden'}></div><div id="docArea"></div>`;
+  $$('.tabs button', el).forEach(b => b.onclick = () => { currentTab[v.id] = b.dataset.tab; renderPaper(el, v); });
+  if (tab === 'sum') renderSummaryTab(v);
+  else if (tab === 'body') renderBodyTab(v);
+  else if (tab === 'figs') renderGallery(v);
+  else renderQaTab(v);
+}
+function briefText(b) {
+  return [`[논문] ${b.title} (${[b.author, b.journal, b.year].filter(Boolean).join(', ')})`,
+    b.abstract ? `[초록]\n${b.abstract}` : '', b.headings?.length ? `[절 제목]\n${b.headings.join(' / ')}` : '',
+    b.keypoints ? `[md의 기존 정리본 요약]\n${b.keypoints}` : '', b.conclusion ? `[결론]\n${b.conclusion}` : '',
+    b.figs?.length ? `[그림·표 목록]\n${b.figs.map(f => `${f.label}: ${f.cap || '(캡션 없음)'}`).join('\n')}` : ''].filter(Boolean).join('\n\n');
+}
+const SUM_RULES_DEFAULT = `너는 레이저·광학 논문을 한국어로 요약하는 도우미다. 독자는 이 분야 대학원생이다. 아래 [자료]만 근거로 쓰고, 자료에 없는 수치·주장은 지어내지 않는다 (모르면 "자료에 없음"). 수식은 $...$ LaTeX. 형식(마크다운, 소제목 그대로):
+## 한 줄 요약
+## 연구 질문과 배경
+## 방법 (장치·시료·조건)
+## 핵심 결과 (수치를 그대로)
+## 의의와 한계
+그림은 따로 모으지 말고 본문 안에 녹인다: [자료]의 그림·표 목록에서 핵심 2~4개를 골라, 그 그림이 무엇을 보여 주는지 설명하는 문장을 쓰고 그 문장 끝에 [[Fig 1]] 처럼 대괄호 두 겹으로 번호를 붙인다 (표는 [[Tab 1]]). 예: "…흡수체가 있으면 펄스가 안정되는 공진기 범위가 넓어지는데, 이를 보여 주는 것이 [[Fig 2]]이다." 같은 그림은 한 번만, 목록에 없는 번호는 쓰지 않는다. 그림 번호를 "그림:" 줄로 따로 모으지 않는다.
+본문 뒤에 아래 절을 붙인다 (본문에서 [[…]]로 가리킨 그림마다 하나씩, 다른 그림은 쓰지 않음):
+## 그림 설명
+### [[Fig 1]]
+**캡션(한글)**: 원 캡션을 한국어로 옮김 (전문용어는 영문 병기)
+**보는 법**: 축·곡선·기호·패널이 각각 무엇인지, 어디를 봐야 하는지, 수치가 뜻하는 것, 본문 결론과 어떻게 이어지는지 3~6문장. 자료에 없는 것은 "자료에 없음".
+전체 1500~3500자.`;
+/* 요약 문단 ID: 'sum:' + djb2(문단 글자) — notes_sync.py 의 sum_block_id 와 같은 규칙 (요약 md 사본의 같은 자리에 노트가 들어감) */
+function h32(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; return h.toString(36); }
+function sumChunks(text) {   // 빈 줄로 나눈 문단 (마지막 "그림: …" 줄은 뺌)
+  const out = [];
+  String(text || '').replace(/\r/g, '').replace(/^\s*그림\s*[:：].*$/m, '').split(/\n{2,}/).map(c => c.trim()).filter(Boolean).forEach(c => {
+    const i = c.indexOf('\n');                       // "## 제목\n본문" 은 제목과 본문을 따로 (질문은 본문 문단에 달리게)
+    if (/^#{1,4}\s/.test(c) && i > 0) { out.push(c.slice(0, i).trim()); out.push(c.slice(i + 1).trim()); } else out.push(c);
+  });
+  return out.filter(Boolean);
+}
+const FIGREF_RE = /\[\[\s*(fig(?:ure)?|tab(?:le)?)\.?\s*([A-Za-z0-9][A-Za-z0-9\-]*)\s*\]\]/gi;
+const figLabel = (kind, num) => (/^f/i.test(kind) ? 'Fig ' : 'Tab ') + num;
+function inlineFigs(c) { return [...c.matchAll(FIGREF_RE)].map(m => figLabel(m[1], m[2])); }
+function splitFigNotes(text) {   // "## 그림 설명" 절을 떼어 {label: 설명} 으로 (notes_sync.py split_fig_notes 와 같은 규칙)
+  const s = String(text || '').replace(/\r/g, '');
+  const m = s.match(/^##\s*그림\s*설명.*$/m);
+  if (!m) return { main: s, notes: {} };
+  const main = s.slice(0, m.index), notes = {};
+  s.slice(m.index + m[0].length).split(/^###\s*/m).forEach(piece => {
+    const nl = piece.indexOf('\n'), head = nl < 0 ? piece : piece.slice(0, nl), body = nl < 0 ? '' : piece.slice(nl + 1).trim();
+    const f = [...head.matchAll(FIGREF_RE)][0]; if (f && body) notes[figLabel(f[1], f[2])] = body;
+  });
+  return { main, notes };
+}
+const sumId = c => 'sum:' + h32(c.replace(/\s+/g, ' ').trim());
+function sumBlocks(key, text, shown, notes) {   // 문단 안의 [[Fig n]] 자리에 번호 칩, 그 문단 바로 아래에 그 그림 + 한글 캡션·보는 법
+  return sumChunks(text).map(c => {
+    const id = sumId(c);
+    const h = c.match(/^#{1,4}\s+(.*)$/);
+    if (h && !c.includes('\n')) return `<div class="blk k-h" data-b="${id}"><h3>${esc(h[1])}</h3></div>`;
+    const labels = inlineFigs(c).filter(l => !shown.has(l) && shown.add(l));
+    const html = mdLite(c).replace(FIGREF_RE, (m, k, n) => `<span class="figref">${esc(figLabel(k, n))}</span>`);
+    return `<div class="blk k-p" data-b="${id}">${html}${sumFigures(key, labels, notes)}</div>`;
+  }).join('');
+}
+async function renderSummaryTab(v) {
+  const p = v.paper, host = $('#sumHost'); if (!host) return;
+  const s = sums.get(p.k);
+  let parts = docParts.get(p.k);
+  if (!parts) { try { await fetchDoc(p.k); parts = docParts.get(p.k); } catch(e) {} }
+  if (!s) {
+    host.innerHTML = `<div class="sumcard" id="sumMain"><div class="top"><b>Claude 핵심 요약</b><span>아직 없음 — 버튼을 누르면 초록·결론·절 핵심·그림 캡션을 보내 한글 요약을 만들고 저장함 (내 사용량으로, 한 번만). 만들어진 요약의 문단마다 질문·메모를 달 수 있음.</span></div>
+      <div class="row"><button class="btn pri" data-gen>Claude 핵심 요약 (한글)</button><span class="msg"></span></div></div><div id="reqHost"></div>`;
+    $('[data-gen]', host).onclick = () => genSummary(v, $('#sumMain'));
+    renderReqs(v);
+    return;
+  }
+  const shown = new Set(), { main, notes } = splitFigNotes(s.text);
+  const blocks = sumBlocks(p.k, main, shown, notes);
+  const tail = sumFigures(p.k, (s.figs || []).filter(l => !shown.has(l)), notes);   // 본문에 [[Fig n]]로 안 들어간 그림만 뒤에
+  host.innerHTML = `<div class="sumcard" id="sumMain"><div class="top"><b>Claude 핵심 요약</b><span>${esc(fmt(s.at))}${s.cut ? ' · (중간에 끊김)' : ''}${s.editedAt ? ' · 고침' : ''}</span><span class="sp" style="flex:1"></span>
+      <button class="btn ghost" data-edit>고치기</button><button class="btn ghost" data-regen>다시 요약</button><button class="btn ghost" data-del>삭제</button></div>
+    <p class="hint" style="margin:0 0 6px">문장을 드래그하거나 문단 왼쪽 <b>?</b>로 이 요약에 질문·메모. 고치거나 다시 요약하면 바뀐 문단의 노트는 "자리를 잃은 노트"가 됨.</p>
+    <article class="doc sumdoc" data-doc="${esc(p.k)}"><div class="body">${blocks}</div>${tail}</article></div><div id="reqHost"></div>`;
+  const mainCard = $('#sumMain', host);
+  wireArticle($('article', mainCard), v, p.k);
+  renderReqs(v);
+  if (pendingScroll) { const t = host.querySelector(`.blk[data-b="${CSS.escape(pendingScroll)}"]`); if (t) { pendingScroll = null; setTimeout(() => { t.scrollIntoView({block: 'center'}); t.classList.add('flash'); }, 60); } }
+  $('[data-regen]', mainCard).onclick = () => genSummary(v, mainCard);
+  $('[data-del]', mainCard).onclick = e => { const b = e.target; if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = '정말 지울까요? 한 번 더'; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '삭제'; } }, 3000); return; } delSum(p.k); toast('요약 지움'); };
+  $('[data-edit]', mainCard).onclick = () => {
+    const box = document.createElement('div'); box.className = 'tedit';
+    box.innerHTML = `<div class="lab">요약 고치기 (마크다운·수식 가능. 문장 뒤에 [[Fig 2]] 처럼 적으면 그 문단 아래에 그림이 붙음)</div><textarea style="min-height:260px">${esc(s.text)}</textarea><div class="row"><button class="btn pri" data-save>저장</button><button class="btn ghost" data-cancel>취소</button></div>`;
+    $('article', mainCard).replaceWith(box);
+    $('[data-cancel]', box).onclick = () => renderSummaryTab(v);
+    $('[data-save]', box).onclick = async () => { const t = $('textarea', box).value.trim(); if (!t) return; await putSum({ ...s, text: t, figs: parseFigs(t), editedAt: new Date().toISOString() }); renderSummaryTab(v); toast('요약 고침'); };
+  };
+}
+
+/* ---------- 추가 요청: 절 요약·목차 정리 등 (긴 논문·학위논문·서적용). 요청마다 카드 하나, 따로 고치고 지움 ---------- */
+const REQ_RULES_DEFAULT = `너는 레이저·광학 논문을 한국어로 정리하는 도우미다. 독자는 이 분야 대학원생이다. 아래 [자료]만 근거로 [요청]을 수행한다. 자료에 없는 수치·주장은 지어내지 않는다 (모르면 "자료에 없음"). 수식은 $...$ LaTeX. 마크다운으로, 소제목(##)과 목록을 써서 읽기 쉽게. 요청이 절·장 요약이면 그 절의 논리 흐름·핵심 수치·결론을 빠짐없이, 요청이 목차 정리면 각 절이 무엇을 다루는지 한두 줄씩. [자료]에 그림·표 목록이 있고 요청과 관련되면, 그 그림이 무엇을 보여 주는지 쓰는 문장 끝에 [[Fig 1]] 처럼 번호를 붙인다(같은 그림은 한 번만, 목록에 없는 번호는 쓰지 않음). 길이는 요청에 맞춘다(보통 800~3000자).`;
+const REQ_CHIPS = ['목차를 절마다 한두 줄로 정리해 줘', 'Introduction 요약해 줘', '실험 방법(Experimental) 요약해 줘', '결과와 결론 요약해 줘'];
+const KO_WORDS = { '서론': 'introduction', '도입': 'introduction', '배경': 'background', '이론': 'theor', '방법': 'method', '실험': 'experiment', '장치': 'setup', '결과': 'result', '토의': 'discussion', '논의': 'discussion', '결론': 'conclusion', '요약': 'summary', '초록': 'abstract', '부록': 'appendix', '모델': 'model', '시뮬레이션': 'simulation', '측정': 'measurement', '설계': 'design', '참고문헌': 'reference' };
+function pickSections(q, sections) {   // 요청 글에서 절 번호·낱말을 뽑아 맞는 절(과 그 하위 절)을 고름. 못 고르면 전체 개요
+  const ql = q.toLowerCase();
+  const nums = [...ql.matchAll(/(?:chapter|chap\.?|section|sec\.?|part|장|절)?\s*(\d+(?:\.\d+)*)\s*(?:장|절)?/g)].map(m => m[1]).filter(n => n.length <= 6);
+  const words = new Set((ql.match(/[a-z][a-z\-]{3,}/g) || []));
+  Object.entries(KO_WORDS).forEach(([k, e]) => { if (ql.includes(k)) words.add(e); });
+  const hit = sections.map((s, i) => {
+    const h = s.h.toLowerCase(); let sc = 0;
+    const hn = h.match(/^(?:chapter|chap\.?|section|sec\.?|part)?\s*(\d+(?:\.\d+)*)/);
+    nums.forEach(n => { if (hn && (hn[1] === n || hn[1].startsWith(n + '.'))) sc += 3; });
+    words.forEach(w => { if (h.includes(w)) sc += 2; });
+    return sc;
+  });
+  let sel = sections.filter((s, i) => hit[i] > 0);
+  const mode = sel.length ? 'sections' : 'overview';
+  if (!sel.length) sel = sections;
+  const outline = sections.map(s => '  '.repeat(Math.max(0, s.l - 2)) + '- ' + s.h).join('\n');
+  let budget = 60000, body = '';
+  if (mode === 'sections') {
+    const each = Math.max(3000, Math.floor(budget / sel.length));
+    body = sel.map(s => `### ${s.h}\n${s.t.length > each ? s.t.slice(0, each) + ' …(이하 생략)' : s.t}`).join('\n\n');
+  } else {
+    const each = Math.max(300, Math.floor(40000 / Math.max(1, sel.length)));
+    body = sel.map(s => `### ${s.h}\n${s.t.slice(0, each)}${s.t.length > each ? ' …' : ''}`).join('\n\n');
+  }
+  return { mode, outline, body: body.slice(0, budget), picked: mode === 'sections' ? sel.map(s => s.h) : [] };
+}
+function reqPrompt(p, parts, q) {
+  const b = parts.brief || {}, sec = parts.sections || [];
+  const pk = pickSections(q, sec);
+  return `${DATA.reqRules || REQ_RULES_DEFAULT}
+
+[요청] ${q}
+
+[논문] ${b.title || p.t} (${[b.author || p.a, b.journal || p.j, b.year || p.y].filter(Boolean).join(', ')})
+${b.abstract ? `[초록]\n${b.abstract.slice(0, 3000)}\n` : ''}
+[목차]
+${pk.outline.slice(0, 6000)}
+
+[${pk.mode === 'sections' ? '요청과 관련된 절의 본문' : '각 절의 앞부분 (전체 개요)'}]
+${pk.body}
+${b.figs?.length ? `\n[그림·표 목록]\n${b.figs.map(f => `${f.label}: ${f.cap || '(캡션 없음)'}`).join('\n').slice(0, 6000)}` : ''}`;
+}
+function renderReqs(v) {
+  const p = v.paper, host = $('#reqHost'); if (!host) return;
+  const list = reqsOf(p.k);
+  host.innerHTML = `<div class="reqbox"><div class="lab">추가 요청 — 원하는 부분만 따로 정리 (긴 논문·학위논문·서적용. 요청마다 카드가 아래에 쌓이고 따로 고치거나 지울 수 있음)</div>
+      <div class="chips">${REQ_CHIPS.map(c => `<button type="button" class="chip" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+      <textarea id="reqText" placeholder="예: 2. Experimental procedure 요약해 줘 / Chapter 5 요약 / 이 논문의 목차를 싹 정리해 줘 / 3.2절의 수식 유도를 자세히"></textarea>
+      <div class="row"><button class="btn pri" data-go>요청</button><span class="msg">절 번호나 제목(영문·한글)을 적으면 그 절 본문을 보내고, 없으면 전체 개요를 보냄.</span></div></div>
+    <div id="reqList">${list.map(r => reqCardHtml(p, r)).join('')}</div>`;
+  $$('#reqList article', host).forEach(a => wireArticle(a, v, p.k));
+  $$('[data-chip]', host).forEach(b => b.onclick = () => { const ta = $('#reqText', host); ta.value = b.dataset.chip; ta.focus(); });
+  $('[data-go]', host).onclick = () => { const q = $('#reqText', host).value.trim(); if (!q) { $('#reqText', host).focus(); return; } genReq(v, q, null); };
+  $('#reqText', host).addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) $('[data-go]', host).click(); });
+  host.onclick = e => {
+    const b = e.target.closest('[data-ract]'); if (!b) return;
+    const id = b.closest('.reqcard')?.dataset.r, r = reqs.get(id); if (!r) return;
+    const act = b.dataset.ract;
+    if (act === 'del') { if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = '정말 지울까요? 한 번 더'; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '삭제'; } }, 3000); return; } delReq(id); toast('요청 지움'); }
+    if (act === 'redo') genReq(v, r.q, id);
+    if (act === 'edit') {
+      const card = b.closest('.reqcard'), box = document.createElement('div'); box.className = 'tedit';
+      box.innerHTML = `<div class="lab">답 고치기 (마크다운·수식 가능)</div><textarea style="min-height:200px">${esc(r.text)}</textarea><div class="row"><button class="btn pri" data-save>저장</button><button class="btn ghost" data-cancel>취소</button></div>`;
+      $('article', card).replaceWith(box);
+      $('[data-cancel]', box).onclick = () => renderReqs(v);
+      $('[data-save]', box).onclick = async () => { const t = $('textarea', box).value.trim(); if (!t) return; await putReq({ ...r, text: t, figs: parseFigs(t), editedAt: new Date().toISOString() }); renderReqs(v); toast('고침'); };
+    }
+    if (act === 'editq') {
+      const card = b.closest('.reqcard'), box = document.createElement('div'); box.className = 'tedit';
+      box.innerHTML = `<div class="lab">요청 제목 고치기</div><textarea style="min-height:50px">${esc(r.q)}</textarea><div class="row"><button class="btn pri" data-save>저장</button><button class="btn ghost" data-cancel>취소</button></div>`;
+      $('.top', card).after(box);
+      $('[data-cancel]', box).onclick = () => renderReqs(v);
+      $('[data-save]', box).onclick = async () => { const t = $('textarea', box).value.trim(); if (!t) return; await putReq({ ...r, q: t, editedAt: new Date().toISOString() }); renderReqs(v); };
+    }
+  };
+}
+function reqCardHtml(p, r) {
+  const shown = new Set(), { main, notes } = splitFigNotes(r.text || '');
+  const blocks = sumBlocks(p.k, main, shown, notes);
+  return `<div class="sumcard reqcard" data-r="${esc(r.id)}"><div class="top"><b>요청</b><span class="q">${esc(r.q)}</span><span>${esc(fmt(r.at))}${r.cut ? ' · (중간에 끊김)' : ''}${r.editedAt ? ' · 고침' : ''}${r.mode === 'overview' ? ' · 전체 개요로 답함' : ''}</span><span class="sp" style="flex:1"></span>
+      <button class="btn ghost" data-ract="editq">요청 고치기</button><button class="btn ghost" data-ract="edit">답 고치기</button><button class="btn ghost" data-ract="redo">다시</button><button class="btn ghost" data-ract="del">삭제</button></div>
+    <article class="doc sumdoc" data-doc="${esc(p.k)}" data-nodoc="1"><div class="body">${blocks}</div></article></div>`;
+}
+async function genReq(v, q, existingId) {
+  if (!sampleFn) { toast('이 화면에서는 Claude를 부를 수 없음 (claude.ai에서 열어야 함).'); return; }
+  const p = v.paper; let parts = docParts.get(p.k);
+  if (!parts) { try { await fetchDoc(p.k); parts = docParts.get(p.k); } catch(e) { toast('문서를 불러오지 못함'); return; } }
+  if (!(parts.sections || []).length) { toast('이 논문 문서에는 절별 본문이 없음 (서재를 다시 생성해야 함). 요약 발췌만으로 답함.'); }
+  const prompt = reqPrompt(p, parts, q), pk = pickSections(q, parts.sections || []);
+  const list = $('#reqList'); if (!list) return;
+  const card = document.createElement('div'); card.className = 'sumcard reqcard';
+  card.innerHTML = `<div class="top"><b>요청</b><span class="q">${esc(q)}</span><span>${pk.mode === 'sections' ? '보내는 절: ' + esc(pk.picked.slice(0, 4).join(' / ')) + (pk.picked.length > 4 ? ' 외' : '') : '전체 개요를 보냄'}</span><span style="flex:1"></span><button class="btn" data-stop>멈추기</button></div><div class="body streaming">생각하는 중…</div><div class="row"><span class="msg"></span></div>`;
+  const old = existingId ? list.querySelector(`.reqcard[data-r="${CSS.escape(existingId)}"]`) : null;
+  if (old) old.replaceWith(card); else list.append(card);
+  if ($('#reqText')) $('#reqText').value = '';
+  const body = $('.body', card), ctl = new AbortController();
+  $('[data-stop]', card).onclick = () => ctl.abort();
+  const base = existingId && reqs.get(existingId) ? reqs.get(existingId) : { id: 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), key: p.k, title: p.t, src: p.rel, year: p.y, at: new Date().toISOString() };
+  try {
+    const r = await sampleFn([{role: 'user', content: prompt}], askOpts({ signal: ctl.signal, onText: ({text}) => { body.textContent = text; } }));
+    await putReq({ ...base, q, text: r.text, figs: parseFigs(r.text), mode: pk.mode, picked: pk.picked.slice(0, 20), at: existingId ? base.at : new Date().toISOString(), redoneAt: existingId ? new Date().toISOString() : undefined, cut: !!r.truncated });
+    toast('저장함'); renderReqs(v);
+  } catch(e) {
+    body.classList.remove('streaming');
+    if (e?.text) { await putReq({ ...base, q, text: e.text + '\n\n(중간에 끊김)', figs: parseFigs(e.text), mode: pk.mode, cut: true }); renderReqs(v); return; }
+    $('.msg', card).className = 'err'; $('.msg', card).textContent = ERR[e?.code] || ('답을 받지 못함 (' + (e?.code || '오류') + ')');
+    $('[data-stop]', card).replaceWith(Object.assign(document.createElement('button'), { className: 'btn', textContent: '닫기', onclick: () => renderReqs(v) }));
+  }
+}
+async function renderBodyTab(v) {   // 원문·번역 + (있으면) md 의 기존 정리본을 접어서
+  const p = v.paper, host = $('#docArea');
+  await loadDoc(p.k, host, v, false, 'body');
+  const parts = docParts.get(p.k);
+  if (!parts || !parts.legacy.trim() || !host.querySelector('article')) return;
+  const d = document.createElement('details'); d.className = 'files';
+  d.innerHTML = `<summary>md의 기존 정리본 (이전 작업의 요약·해설·번역) 펼치기</summary><div class="legacyHost"></div>`;
+  host.prepend(d);
+  d.addEventListener('toggle', () => { const lh = $('.legacyHost', d); if (d.open && !lh.children.length) { lh.innerHTML = `<article class="doc" data-doc="${esc(p.k)}">${parts.legacy}</article>`; wireArticle($('article', lh), v, p.k); } });
+}
+function parseFigs(text) {   // 본문의 [[Fig n]] + (옛 형식) 마지막 "그림: …" 줄
+  const out = inlineFigs(text);
+  const m = text.match(/^\s*그림\s*[:：]\s*(.+)$/m);
+  if (m && !/없음/.test(m[1])) m[1].split(/[,，、]/).map(x => x.trim().replace(/\.?\s*(\d)/, ' $1').replace(/^fig(ure)?\s*/i, 'Fig ').replace(/^tab(le)?\s*/i, 'Tab ').replace(/\s+/g, ' ')).filter(Boolean).forEach(l => out.push(l));
+  return [...new Set(out)];
+}
+function sumFigures(key, labels, notes = {}) {   // 그림 + 원 캡션(작게) + 한글 캡션·보는 법 블록(질문·메모 가능)
+  const parts = docParts.get(key); if (!parts || !labels.length) return '';
+  const caps = Object.fromEntries((parts.brief.figs || []).map(f => [f.label, f.cap]));
+  return labels.map(l => { const f = parts.tpl.content.querySelector(`figure[data-fig="${CSS.escape(l)}"]`); if (!f) return '';
+    const img = f.querySelector('img'), note = notes[l];
+    return `<figure><img loading="lazy" src="${img?.getAttribute('src') || ''}" alt=""><figcaption><b>${esc(l)}</b> ${esc(caps[l] || '')}</figcaption></figure>` +
+      (note ? `<div class="blk k-p fignote" data-b="${sumId(note)}"><div class="lab">${esc(l)} 설명</div>${mdLite(note)}</div>` : ''); }).join('');
+}
+async function genSummary(v, host) {
+  if (!sampleFn) { toast('이 화면에서는 Claude를 부를 수 없음 (claude.ai에서 열어야 함).'); return; }
+  const p = v.paper; let parts = docParts.get(p.k);
+  if (!parts) { try { await fetchDoc(p.k); parts = docParts.get(p.k); } catch(e) { toast('문서를 불러오지 못함'); return; } }
+  const prompt = `${DATA.sumRules || SUM_RULES_DEFAULT}\n\n[자료]\n${briefText(parts.brief).slice(0, 36000)}`;
+  const card = document.createElement('div'); card.className = 'sumcard';
+  card.innerHTML = `<div class="top"><b>Claude 핵심 요약</b><span>만드는 중…</span><span style="flex:1"></span><button class="btn" data-stop>멈추기</button></div><div class="body streaming">생각하는 중…</div><div class="row"><span class="msg"></span></div>`;
+  if (host.classList.contains('sumcard')) host.replaceWith(card); else { host.innerHTML = ''; host.append(card); }   // 요약 카드 자리에만 바꿔 끼움 (아래 요청 상자·카드는 그대로)
+  const body = $('.body', card), ctl = new AbortController();
+  $('[data-stop]', card).onclick = () => ctl.abort();
+  try {
+    const r = await sampleFn([{role: 'user', content: prompt}], askOpts({ signal: ctl.signal, onText: ({text}) => { body.textContent = text; } }));
+    await putSum({ key: p.k, title: p.t, src: p.rel, year: p.y, text: r.text, figs: parseFigs(r.text), at: new Date().toISOString(), cut: !!r.truncated });
+    toast('요약을 저장함'); renderSummaryTab(v);
+  } catch(e) {
+    body.classList.remove('streaming');
+    if (e?.text) { await putSum({ key: p.k, title: p.t, src: p.rel, year: p.y, text: e.text + '\n\n(중간에 끊김)', figs: parseFigs(e.text), at: new Date().toISOString(), cut: true }); renderSummaryTab(v); return; }
+    $('.msg', card).className = 'err'; $('.msg', card).textContent = ERR[e?.code] || ('요약을 받지 못함 (' + (e?.code || '오류') + ')');
+    $('[data-stop]', card).replaceWith(Object.assign(document.createElement('button'), { className: 'btn', textContent: '다시 시도', onclick: () => renderSummaryTab(v) }));
+  }
+}
+/* 그림·표 탭 */
+async function renderGallery(v) {
+  const p = v.paper, host = $('#docArea'); host.innerHTML = '<p class="loading">그림을 불러오는 중…</p>';
+  let parts = docParts.get(p.k);
+  if (!parts) { try { await fetchDoc(p.k); parts = docParts.get(p.k); } catch(e) { host.innerHTML = '<p class="miss">문서를 불러오지 못함.</p>'; return; } }
+  const caps = Object.fromEntries((parts.brief.figs || []).map(f => [f.label, f.cap]));
+  const figs = [...parts.tpl.content.querySelectorAll('figure[data-fig]')];
+  if (!figs.length) { host.innerHTML = '<p class="empty">이 논문 md에는 그림·표 이미지가 없음.</p>'; return; }
+  host.innerHTML = `<p class="hint">그림을 누르면 크게 봄. 본문 속 위치에서 질문하려면 <b>원문·번역</b> 탭에서 그 그림 아래 문단에 물어보세요.</p><div class="gallery">${figs.map(f => { const l = f.dataset.fig, src = f.querySelector('img')?.getAttribute('src') || '';
+    return `<figure><img loading="lazy" src="${src}" alt="" data-zoom><figcaption><b>${esc(l)}</b> ${esc(caps[l] || f.querySelector('figcaption')?.textContent || '')}</figcaption></figure>`; }).join('')}</div>`;
+}
+document.addEventListener('click', e => {
+  const im = e.target.closest('img[data-zoom], .doc figure:not(.eq) img, .sumcard figure img'); if (!im) return;
+  const lb = document.createElement('div'); lb.className = 'lightbox'; lb.innerHTML = `<img src="${im.getAttribute('src')}" alt="">`;
+  lb.onclick = () => lb.remove(); document.body.append(lb);
+});
+/* 질문·메모 탭 */
+function renderQaTab(v) {
+  const p = v.paper, host = $('#docArea');
+  const list = [...threads.values()].filter(t => t.doc === p.k).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  host.innerHTML = `<p class="hint">이 논문에 단 질문·답·메모 전부. "본문에서 보기"로 그 문단에 감. 새 질문은 <b>요약</b> 탭${LIB.lite ? '' : '이나 <b>원문·번역</b> 탭'}에서 문단 왼쪽 <b>?</b> 또는 위 [이 문서에 질문].</p><div id="nlist"></div>`;
+  $('#nlist', host).innerHTML = list.length ? list.map(t => `<div class="nitem"><div class="where">${esc(t.section || '(문서 전체)')} · ${esc(fmt(t.updatedAt))}</div>
+      ${t.quote ? `<div class="quote">“${esc(t.quote.slice(0, 300))}”</div>` : ''}${(t.turns || []).length ? `<ul class="qs">${t.turns.map(u => `<li>${esc(u.q)}</li>`).join('')}</ul>` : ''}
+      ${t.memo ? `<div class="mm">${mdLite(t.memo)}</div>` : ''}<div class="row"><button class="btn" data-goto="${esc(t.id)}">본문에서 보기</button></div></div>`).join('') : '<div class="empty">아직 이 논문에 질문·메모가 없음.</div>';
+  typeset(host);
+  host.onclick = e => { const id = e.target.closest('[data-goto]')?.dataset.goto; if (!id) return; const t = threads.get(id); if (!t) return;
+    currentTab[v.id] = LIB.lite || t.block.startsWith('sum:') ? 'sum' : 'body'; pendingScroll = t.block.startsWith('_doc:') ? null : t.block; renderPaper($('#view'), v); };
+}
+/* 검색 화면 */
+function renderSearchView(el) {
+  const q = searchQ || $('#psearch').value.trim();
+  if ($('#psearch').value.trim() !== q) $('#psearch').value = q;
+  const hits = q ? LIB.papers.filter(p => metaMatch(p, q)) : [];
+  const row = (p, extra) => `<div class="sres"><div class="w">${esc(p.folder)} · ${esc([p.a, p.j].filter(Boolean).join(' · '))}${extra || ''}</div>
+    <a class="t" href="#p-${p.k}" data-find="${esc(q)}">${p.y ? esc(p.y) + ', ' : ''}${hl(p.t, q)}</a>${p.ex ? `<p class="ex">${hl(p.ex.slice(0, 260), q)}…</p>` : ''}</div>`;
+  el.innerHTML = `<div class="vhead"><div class="kick">검색</div><h1>${q ? `“${esc(q)}”` : '논문 검색'}</h1></div>
+    <p class="hint">제목·저자·연도·학술지·태그·초록에서 찾음 (띄어 쓴 낱말은 모두 들어 있어야 함). <b>본문까지 찾기</b>는 모든 논문의 전체 글(원문·번역·정리본)에서 찾음 — 처음 한 번 색인(수 MB)을 내려받음.</p>
+    ${q ? `<div class="row" style="margin-bottom:10px"><span>제목·초록에서 <b>${hits.length}</b>편</span><button class="btn" id="fullBtn">본문까지 찾기</button><span class="msg" id="fullMsg"></span></div>` : ''}
+    <div id="slist">${hits.map(p => row(p)).join('') || (q ? '<div class="empty">제목·초록에는 없음. "본문까지 찾기"를 눌러 보세요.</div>' : '<div class="empty">왼쪽 검색창에 낱말을 치고 Enter.</div>')}</div>`;
+  el.onclick = e => { const a = e.target.closest('a[data-find]'); if (a) pendingFind = a.dataset.find.split(/\s+/)[0]; };
+  const fb = $('#fullBtn', el);
+  if (fb) fb.onclick = async () => {
+    fb.disabled = true; $('#fullMsg').textContent = fullIndex ? '찾는 중…' : '색인을 내려받는 중…';
+    try { if (!fullIndex) { const r = await fetch('search/full.json'); if (!r.ok) throw 0; fullIndex = await r.json(); } }
+    catch(e) { $('#fullMsg').textContent = '색인을 내려받지 못함.'; fb.disabled = false; return; }
+    const toks = tokensJs(q); let set = null;
+    toks.forEach(t => { const ids = new Set(fullIndex.idx[t] || []); set = set ? new Set([...set].filter(i => ids.has(i))) : ids; });
+    const ids = [...(set || [])].map(i => LIB.papers[i]).filter(Boolean);
+    const seen = new Set(hits.map(p => p.k)), more = ids.filter(p => !seen.has(p.k));
+    $('#fullMsg').textContent = `본문에서 ${ids.length}편 (제목·초록 결과 밖 ${more.length}편)`;
+    $('#slist', el).innerHTML = (hits.map(p => row(p)).join('')) + (more.length ? `<h2 style="font-family:var(--f-title);font-size:17px;margin:18px 0 4px">본문에만 있는 논문</h2>` + more.map(p => row(p, ' · 본문에서 찾음')).join('') : '') || '<div class="empty">본문에서도 찾지 못함.</div>';
+  };
+}
+function tokensJs(q) {   // library.py tokens() 와 같은 규칙
+  const s = q.toLowerCase(), out = new Set();
+  (s.match(/[a-z0-9][a-z0-9+\-]*[a-z0-9]|[a-z0-9]/g) || []).forEach(w => { if (w.length >= 2 && w.length <= 30) out.add(w); });
+  (s.match(/[가-힣]+/g) || []).forEach(w => { if (w.length === 1) out.add(w); for (let i = 0; i < w.length - 1; i++) out.add(w.slice(i, i + 2)); });
+  return [...out];
+}
+/* 요약 모음 */
+function renderSumsView(el) {
+  const prevQ = $('#ssearch', el)?.value || '';
+  const list = [...sums.values()].sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  el.innerHTML = `<div class="vhead"><div class="kick">정리</div><h1>Claude 요약 모음</h1></div>
+    <p class="hint">논문 화면에서 만든 한글 핵심 요약 전부 (${list.length}편). "노트 동기화"를 하면 md로도 남음: <code>${esc(DATA.sumDirWin)}</code> <button class="linkbtn" data-copy="${esc(DATA.sumDirWin)}">경로 복사</button></p>
+    <input class="search" id="ssearch" placeholder="요약 내용에서 찾기" value="${esc(prevQ)}" aria-label="요약 검색"><div id="slist"></div>`;
+  const draw = () => { const q = $('#ssearch', el).value.trim().toLowerCase();
+    const f = list.filter(s => !q || (s.title + ' ' + s.text).toLowerCase().includes(q));
+    $('#slist', el).innerHTML = f.map(s => `<div class="nitem"><div class="where">${esc(PAPERS[s.key]?.folder || '')} · ${esc(fmt(s.updatedAt || s.at))}</div>
+      <a href="#p-${esc(s.key)}" style="font-size:15.5px;font-weight:500;text-decoration:none">${s.year ? esc(s.year) + ', ' : ''}${esc(s.title)}</a>
+      <div class="mm" style="background:var(--sheet)">${mdLite((s.text.match(/## 한 줄 요약\s*\n([\s\S]*?)(?=\n## |$)/) || [, s.text.slice(0, 300)])[1].trim())}</div></div>`).join('') || '<div class="empty">아직 요약이 없음. 논문 화면 요약 탭에서 [Claude 핵심 요약]을 누르세요.</div>';
+    typeset($('#slist', el)); };
+  $('#ssearch', el).oninput = draw; draw();
+}
+
+/* ---------- 그림을 못 불러올 때 (dash 1.3.0): 한 번 다시 시도, 그래도 안 되면 표시하고 새로 고침 안내 ---------- */
+let imgBanner = false;
+document.addEventListener('error', e => {
+  const im = e.target; if (!(im instanceof HTMLImageElement) || !im.closest('article.doc, .sumcard, .gallery')) return;
+  if (!im.dataset.retry) { im.dataset.retry = '1'; const s = im.getAttribute('src'); im.src = s + (s.includes('?') ? '&' : '?') + 'r=' + Date.now(); return; }
+  const f = im.closest('figure'); if (f && !f.querySelector('.miss')) f.insertAdjacentHTML('afterbegin', '<p class="miss">[그림을 불러오지 못함]</p>');
+  if (!imgBanner) { imgBanner = true; toast('그림 일부를 불러오지 못함. 대시보드가 새 판으로 바뀌었을 수 있으니 페이지를 새로 고쳐(F5) 주세요.'); }
+}, true);
+
+/* ---------- 전체 점검 (dash 1.3.0): 모든 문서가 열리는지, 모든 그림이 열리는지, 기능이 켜져 있는지 ---------- */
+async function selfCheck(out) {
+  out.innerHTML = '<p class="loading">점검하는 중…</p>';
+  const rows = [], badDocs = [], imgs = new Map();
+  if (!LIB) for (const [k, m] of Object.entries(DATA.docs)) {
+    let h = ''; try { h = await fetchDoc(k); } catch(e) { badDocs.push(k + ' (불러오지 못함)'); continue; }
+    const d = document.createElement('div'); d.innerHTML = h;
+    const n = d.querySelectorAll('.blk').length;
+    if (!n) badDocs.push(k + ' (블록 0개)');
+    d.querySelectorAll('img').forEach(i => { const src = i.getAttribute('src'); if (src && !imgs.has(src)) imgs.set(src, k); });
+    rows.push([m.title, n]);
+  }
+  const load = src => new Promise(res => { const i = new Image(); const t = setTimeout(() => res(false), 15000);
+    i.onload = () => { clearTimeout(t); res(i.naturalWidth > 0); }; i.onerror = () => { clearTimeout(t); res(false); }; i.src = src; });
+  const srcs = [...imgs.keys()], bad = [];
+  for (let i = 0; i < srcs.length; i += 12) {
+    const r = await Promise.all(srcs.slice(i, i + 12).map(load));
+    r.forEach((ok, j) => { if (!ok) bad.push(srcs[i + j] + ' (' + imgs.get(srcs[i + j]) + ')'); });
+    const l = out.querySelector('.loading'); if (l) l.textContent = `그림 확인 중… ${Math.min(i + 12, srcs.length)}/${srcs.length}`;
+  }
+  const views = DATA.views.flatMap(g => g.items).filter(v => v.tabs).flatMap(v => v.tabs.map(t => t[0]).concat(v.card ? [v.card] : []));
+  const noDoc = LIB ? [] : views.filter(k => !DATA.docs[k]);
+  let cm = null; try { cm = await window.claude?.use?.('comments'); } catch(e) {}
+  const st = cm ? await cm.canSendToClaude().catch(() => 'off') : '없음';
+  const ok = !badDocs.length && !bad.length && !noDoc.length;
+  out.innerHTML = `<div class="notice" style="border-color:${ok ? 'var(--ok)' : 'var(--bad)'};background:${ok ? 'var(--ok-soft)' : 'var(--bad-soft)'}">
+      <b style="color:${ok ? 'var(--ok)' : 'var(--bad)'}">${ok ? '이상 없음' : '문제 있음'}</b> · ${LIB ? `논문 ${Object.keys(DATA.docs).length}편 목록` : `문서 ${rows.length}개, 그림 ${srcs.length}장`} 확인 (${new Date().toLocaleString('ko-KR')})</div>
+    <div class="tbl"><table><tbody>
+      ${LIB ? '' : `<tr><th>문서</th><td>${badDocs.length ? '<b style="color:var(--bad)">' + esc(badDocs.join(', ')) + '</b>' : `${rows.length}개 모두 열림 (블록 ${rows.reduce((a, r) => a + r[1], 0)}개)`}</td></tr>
+      <tr><th>그림</th><td>${bad.length ? `<b style="color:var(--bad)">${bad.length}장 실패</b><br>` + bad.slice(0, 20).map(esc).join('<br>') : `${srcs.length}장 모두 열림`}</td></tr>
+      <tr><th>탭 연결</th><td>${noDoc.length ? '<b style="color:var(--bad)">문서 없는 탭: ' + esc(noDoc.join(', ')) + '</b>' : '모든 탭이 문서에 연결됨'}</td></tr>`}
+      <tr><th>노트 저장소</th><td>${dbLive ? '연결됨' : '연결 안 됨 (이 브라우저에만 저장)'} · 질문·메모 ${threads.size}건</td></tr>
+      <tr><th>Claude 질문</th><td>${sampleFn ? '쓸 수 있음' : '쓸 수 없음 (claude.ai에서 열어야 함)'}</td></tr>
+      <tr><th>노트 동기화 버튼</th><td>${st === 'available' ? 'Claude 세션에 바로 보냄' : st === 'no_session' ? '지금 받는 세션 없음 → 요청만 남김' : '댓글 기능 없음 → 요청만 남김'}</td></tr>
+      <tr><th>엔진</th><td>dash ${esc(DATA.engine || '')} · 생성 ${esc(DATA.built || '')}</td></tr>
+    </tbody></table></div>`;
+}
+
+/* ---------- 시작 ---------- */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideTool(); $('#side').classList.remove('open'); $('.lightbox')?.remove(); } });
+renderNav(); route(); initStore().then(refreshNotes);
+</script>

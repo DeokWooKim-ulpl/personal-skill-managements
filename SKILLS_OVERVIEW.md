@@ -15,6 +15,7 @@
 | paper-scout | 주제 → 논문 조사·포화 판정 → 리포트·원고 | 원본 그대로 |
 | md-slot-finisher | 로컬 PDF→md 도구 산출물의 빈 칸 채우기 | 원본 그대로 |
 | matlab-code | MATLAB 그림 서식 규칙 기반 코드 생성 | 원본 그대로 |
+| artifact-board | 마크다운 원고 → claude.ai 연구 대시보드(목차·읽기 칸·문단별 질문·메모 저장·노트 동기화) / 탭 보고판 아티팩트 생성·갱신 | PC 로컬 스킬. PROJECTS.md(로컬 경로·아티팩트 URL)와 .git·캐시는 제외하고 업로드 |
 
 ## 삭제 (archive/)
 

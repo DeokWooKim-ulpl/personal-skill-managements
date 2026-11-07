@@ -1,30 +1,34 @@
-# 스킬 목록 및 핵심 기능 (2026-11-07 기준)
+# 스킬 관리 현황 (2026-11-07 기준)
 
-총 23개. 출처: 직접 제작(plugin) 10개 / Anthropic 제공 13개 (manifest.json 기준).
+## 폴더 구조
+- `skills/` : 유지하는 직접 제작 스킬 (원본 백업 + 수정본)
+- `archive/` : 삭제 결정된 스킬의 원본 백업
+- `dist/` : claude.ai 재업로드용 zip
 
-## A. 직접 제작 스킬 (10개)
+## 유지 (skills/)
 
-| 스킬 | 핵심 기능 | 규모 | 비고 |
-|---|---|---|---|
-| paper-translate-summary | 광학·레이저 논문 전 섹션 정밀 번역 + 핵심 정리 → 단일 .md. 상단에 Optics Express 서지 표기, 수식·단위 렌더링 규칙 | 101줄 | 핵심 |
-| pdf-to-md | PDF → 마크다운 + Figure PNG 추출(figures 폴더). 외국어→한국어 | 173줄 | 핵심 |
-| detail-references | 본문 인용·참고문헌 전수 대조·교정, 원문 문장 직접 발췌 | 62줄 | 핵심 |
-| reference-check | 참고문헌·인용 발췌문을 원본과 3-Pass 검토 후 교정본 제공 | 65줄 | detail-references와 일부 중복 |
-| numeric-check | 수치·단위·수식을 원본과 3-Pass 대조, 불일치 리포트 | 63줄 | 핵심 |
-| paper-scout | 주제 → 논문 조사·다운로드 요청서·포화 판정 → 아이디어별 40쪽+ 리포트·논문 원고 | 360줄 | 강력하나 무거움 |
-| md-slot-finisher | 로컬 PDF→md 도구 산출물의 빈 칸(TR/SUM/LEGACY/YAML)만 채움 | 88줄 + 보조 4파일 | 로컬 도구 전용 |
-| matlab-code | MATLAB 스크립트 생성 (LaTeX 축 라벨, 그림 서식 규칙) | 45줄 | 유용 |
-| ai-pingpong | Gemini↔Claude 누적 마크다운 교차 검토 | 97줄 | 사용 빈도 확인 필요 |
-| ms-contents-organization | Word/PPT 선택 영역 정리(첨자·표·띄어쓰기, 내용 무변경) | 10줄 | 짧고 설명 빈약 |
+| 스킬 | 핵심 기능 | 비고 |
+|---|---|---|
+| detail-references | 본문 인용·참고문헌 전수 대조·교정, 원문 직접 발췌, 3-Pass 검토, `[Pass]/[Modify]/[Fail]` 판정, 참고문헌 전용 검증 모드(대체 블록) | reference-check 기능 병합 (2026-11-07) |
+| numeric-check | 수치·단위·수식을 원본과 3-Pass 대조 | 원본 그대로 |
+| ai-pingpong | Gemini↔Claude 누적 마크다운 교차 검토 | 원본 그대로 |
+| paper-scout | 주제 → 논문 조사·포화 판정 → 리포트·원고 | 원본 그대로 |
+| md-slot-finisher | 로컬 PDF→md 도구 산출물의 빈 칸 채우기 | 원본 그대로 |
+| matlab-code | MATLAB 그림 서식 규칙 기반 코드 생성 | 원본 그대로 |
 
-## B. Anthropic 제공 스킬 (13개, 삭제·업로드 대상 아님)
+## 삭제 (archive/)
 
-| 스킬 | 기능 |
+| 스킬 | 사유 |
 |---|---|
-| pdf / docx / xlsx / pptx | 각 파일 형식 읽기·생성·편집 |
-| skill-creator | 스킬 제작·개선·평가 |
-| docs / google-workspace | Claude Docs, Google Docs·Sheets·Slides 작업 |
-| deep-research | 다중 소스 조사 보고서 |
-| chrome-browser / built-in-browser / computer-use | 브라우저·데스크톱 제어 |
-| morning | 아침 브리핑 |
-| import-memory | 타 AI 메모리 가져오기 |
+| reference-check | detail-references로 병합 |
+| ms-contents-organization | 사용자 결정 |
+| pdf-to-md | 사용자 결정 |
+| paper-translate-summary | 최근 미사용 (마지막 수정 2026-07-10, 번역은 md-slot-finisher 경로로 대체된 것으로 보임) |
+
+## reference-check → detail-references 병합 내역
+- 추가: 3-Pass 반복 검토, 문맥 적합성(Cherry-picking) 검증, 서지 정보(제목·DOI 포함) 오기 교정, 항목별 판정, 모드 B(참고문헌 전용 검증 + Replacement Block), reference-check·ai-pingpong 인용 검증 트리거
+- 변경: 수식 표기 규칙은 CLAUDE.md 기준(`$` 안쪽 공백 없음)으로 통일 (reference-check의 "공백 1칸" 규칙 폐기)
+- 유지: detail-references 기존 규칙 전부 (인용 번호 형식, 원문 서지 복사, verbatim 발췌)
+
+## Anthropic 제공 스킬 (관리 대상 아님)
+pdf, docx, xlsx, pptx, skill-creator, docs, google-workspace, deep-research, chrome-browser, built-in-browser, computer-use, morning, import-memory

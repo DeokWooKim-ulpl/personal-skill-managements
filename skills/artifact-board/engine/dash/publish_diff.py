@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""dash 1.3.0: 지난 게시 이후 바뀐 파일 목록 (LLM 없이). 양자과제 논문 학습 대시보드의 _작업/publish_diff.py를 일반화한 것.
+"""dash 1.3.0: 지난 게시 이후 바뀐 파일 목록 (LLM 없이). 프로젝트A 논문 학습 대시보드의 _작업/publish_diff.py를 일반화한 것.
 
     python -X utf8 -I publish_diff.py <dash_config.py>           바뀐 파일을 _changed.json에 쓰고 "changed N (index …)" / "unchanged" 출력
     python -X utf8 -I publish_diff.py <dash_config.py> --mark    게시를 마친 뒤 현재 상태를 기록

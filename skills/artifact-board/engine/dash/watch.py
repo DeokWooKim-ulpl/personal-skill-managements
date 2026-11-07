@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""dash 1.3.0: 원고가 바뀌면 대시보드를 자동으로 다시 만듦 (게시는 하지 않음). 한화 논문학습 watch_build.py를 일반화한 것.
+"""dash 1.3.0: 원고가 바뀌면 대시보드를 자동으로 다시 만듦 (게시는 하지 않음). 프로젝트B 논문학습 watch_build.py를 일반화한 것.
 
     python -X utf8 -I watch.py <dash_config.py> [간격초=5] [멈출시각HHMM] [--dir <ROOT 기준 폴더> ...]
 

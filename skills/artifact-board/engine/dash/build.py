@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""artifact-board 연구 대시보드(dash) 생성기 — 한화 과제 연구 대시보드(2026-11-06)를 일반화한 것.
+"""artifact-board 연구 대시보드(dash) 생성기 — 프로젝트B 과제 연구 대시보드(2026-11-06)를 일반화한 것.
 
     python -I build.py <프로젝트의 dash_config.py>
 

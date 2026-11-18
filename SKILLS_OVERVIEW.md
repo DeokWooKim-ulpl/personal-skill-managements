@@ -16,6 +16,7 @@
 | md-slot-finisher | 로컬 PDF→md 도구 산출물의 빈 칸 채우기 | 원본 그대로 |
 | matlab-code | MATLAB 그림 서식 규칙 기반 코드 생성 | 원본 그대로 |
 | artifact-board | 마크다운 원고 → claude.ai 연구 대시보드(목차·읽기 칸·문단별 질문·메모 저장·노트 동기화) / 탭 보고판 아티팩트 생성·갱신 | PC 로컬 스킬. PROJECTS.md·.git·캐시 제외, 과제명은 프로젝트A·B·C로 익명화해 업로드 |
+| ms-equation-cleanup | Word·PPT 의 텍스트 수식(`^`, `_` 표기)을 네이티브 수식 개체로 변환, 단위·화학식 첨자는 위/아래첨자 서식으로 정리 (`scripts/eqfix.py`: scan → apply → check) | 신규 (2026-11-18). python3·lxml·pandoc 필요. archive 의 ms-contents-organization 중 수식·첨자 기능을 대체 |
 
 ## 삭제 (archive/)
 
